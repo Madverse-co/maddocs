@@ -4,8 +4,6 @@ import { initClient } from '@ts-rest/core';
 
 import { ApiContractV1 } from '@documenso/api/v1/contract';
 import { generatePdf } from '@documenso/lib/server-only/madverse';
-import { prisma } from '@documenso/prisma';
-import { DocumentStatus } from '@documenso/prisma/client';
 
 export const config = {
   maxDuration: 60,
@@ -72,14 +70,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { uploadUrl, documentId, recipients: recipientData } = doc.body;
 
-    // const doc = await createDocument({
-    //   title: `${labelName} - Executive Plan Agreement`,
-    //   recipients,
-    // });
-
-    // const { data } = doc;
-    // const { uploadUrl, documentId, recipients: recipientData } = data;
-
     // Upload the PDF file
     const formData = new FormData();
     formData.append('file', pdfFile.file);
@@ -142,15 +132,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: 'Failed to add signature fields', details: errorData });
     }
 
-    // change document status to pending by default (we will send the email from admin dashboard)
-    await prisma.document.update({
-      where: {
-        id: documentId,
+    const sendDocumentResponse = await client.sendDocument({
+      body: {
+        sendEmail: true,
       },
-      data: {
-        status: DocumentStatus.PENDING,
+      params: {
+        id: String(documentId),
       },
     });
+
+    if (sendDocumentResponse.status !== 200) {
+      return res.status(500).json({ error: 'Failed to send document via email' });
+    }
 
     return res.status(200).json({
       success: true,
