@@ -169,39 +169,39 @@ export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams
     // Get coordinates of signature boxes
     const signBoxCoordinates = {
       x: 21,
-      y: 68.6,
+      y: 16.02,
       width: 15.5,
       height: 4,
       marker: 'SIGNATURE',
-      pageNumber: 6,
+      pageNumber: 7,
     };
 
     const nameBoxCoordinates = {
       x: 21,
-      y: 76,
+      y: 23.65,
       width: 15.5,
       height: 4,
       marker: 'NAME',
-      pageNumber: 6,
+      pageNumber: 7,
     };
 
     const dateBoxCoordinates = {
       x: 21,
-      y: 83,
+      y: 30.1,
       width: 15.5,
       height: 4,
       marker: 'DATE',
-      pageNumber: 6,
+      pageNumber: 7,
     };
 
     const signatureBoxCoordinates = [signBoxCoordinates, nameBoxCoordinates, dateBoxCoordinates];
     const madverseSignatureBoxCoordinates = {
       x: 75,
-      y: 68.6,
+      y: 16.02,
       width: 15.5,
       height: 4,
       marker: 'SIGNATURE',
-      pageNumber: 6,
+      pageNumber: 7,
     };
 
     // Generate PDF in memory
