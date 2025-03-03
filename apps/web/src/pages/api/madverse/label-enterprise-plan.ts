@@ -4,6 +4,10 @@ import { createDocument, generatePdf } from '@documenso/lib/server-only/madverse
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 
+export const config = {
+  maxDuration: 60,
+};
+
 const getFieldTypeFromMarker = (marker: string) => {
   switch (marker) {
     case 'NAME':
