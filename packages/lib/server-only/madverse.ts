@@ -26,7 +26,8 @@ interface CreateDocumentPayload {
 
 export async function createDocument(payload: CreateDocumentPayload) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/v1/documents`, {
+    const url = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/v1/documents`;
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         Authorization: process.env.ADMIN_ACCOUNT_API_KEY ?? '',

@@ -1,6 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { createDocument, generatePdf } from '@documenso/lib/server-only/madverse';
+import { initClient } from '@ts-rest/core';
+
+import { ApiContractV1 } from '@documenso/api/v1/contract';
+import { generatePdf } from '@documenso/lib/server-only/madverse';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 
@@ -48,13 +51,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         signingOrder: 2,
       },
     ];
-    const doc = await createDocument({
-      title: `${labelName} - Executive Plan Agreement`,
-      recipients,
+
+    const client = initClient(ApiContractV1, {
+      baseUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}`,
+      baseHeaders: {
+        authorization: `${process.env.ADMIN_ACCOUNT_API_KEY ?? ''}`,
+      },
     });
 
-    const { data } = doc;
-    const { uploadUrl, documentId, recipients: recipientData } = data;
+    const doc = await client.createDocument({
+      body: {
+        title: `${labelName} - Executive Plan Agreement`,
+        recipients,
+      },
+    });
+
+    if (doc.status !== 200) {
+      return res.status(500).json({ error: 'Failed to create document' });
+    }
+
+    const { uploadUrl, documentId, recipients: recipientData } = doc.body;
+
+    // const doc = await createDocument({
+    //   title: `${labelName} - Executive Plan Agreement`,
+    //   recipients,
+    // });
+
+    // const { data } = doc;
+    // const { uploadUrl, documentId, recipients: recipientData } = data;
 
     // Upload the PDF file
     const formData = new FormData();
