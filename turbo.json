@@ -35,7 +35,7 @@
       "cache": false
     }
   },
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": ["**/.env.*local", "ADMIN_ACCOUNT_API_KEY"],
   "globalEnv": [
     "APP_VERSION",
     "NEXT_PRIVATE_ENCRYPTION_KEY",

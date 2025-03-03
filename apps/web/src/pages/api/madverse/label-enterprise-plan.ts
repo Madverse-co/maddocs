@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data } = doc;
     const { uploadUrl, documentId, recipients: recipientData } = data;
 
-    // First upload the PDF file
+    // Upload the PDF file
     const formData = new FormData();
     formData.append('file', pdfFile.file);
 

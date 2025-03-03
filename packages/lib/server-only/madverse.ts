@@ -1,7 +1,7 @@
-import { mkdir, readFile, unlink, writeFile } from 'fs/promises';
-import { join } from 'path';
 import { PDFDocument } from 'pdf-lib';
 import puppeteer from 'puppeteer';
+
+import { labelInvite } from './madverse-templates';
 
 interface GeneratePdfParams {
   labelName: string;
@@ -26,7 +26,7 @@ export async function createDocument(payload: CreateDocumentPayload) {
     const response = await fetch(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/v1/documents`, {
       method: 'POST',
       headers: {
-        Authorization: process.env.ADMIN_ACCOUNT_API_KEY ?? 'api_h5139zr3sc394gsk',
+        Authorization: process.env.ADMIN_ACCOUNT_API_KEY ?? '',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
@@ -53,13 +53,7 @@ export async function createDocument(payload: CreateDocumentPayload) {
 
 export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams) {
   try {
-    // Ensure directories exist
-    await mkdir(join(process.cwd(), 'temp'), { recursive: true });
-    await mkdir(join(process.cwd(), 'generated'), { recursive: true });
-
-    // Read the HTML template
-    const templatePath = join(process.cwd(), 'temp.html');
-    let htmlContent = await readFile(templatePath, 'utf-8');
+    let htmlContent = labelInvite;
 
     // Add consistent styling
     const styleTag = `
@@ -145,14 +139,15 @@ export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams
       labelAddress,
     );
 
-    // Create temporary file with modified content
-    const tempHtmlPath = join(process.cwd(), 'temp', `${Date.now()}.html`);
-    await writeFile(tempHtmlPath, htmlContent);
-
-    // Generate PDF using puppeteer
-    const browser = await puppeteer.launch({ headless: true });
+    // Use puppeteer in memory without writing to disk
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Required for serverless
+    });
     const page = await browser.newPage();
-    await page.goto(`file://${tempHtmlPath}`, { waitUntil: 'networkidle0' });
+
+    // Load HTML content directly instead of from file
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
     // Get coordinates of signature boxes
     const signBoxCoordinates = {
@@ -192,15 +187,8 @@ export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams
       pageNumber: 6,
     };
 
-    // Generate PDF with specific settings
-    const pdfPath = join(
-      process.cwd(),
-      'temp',
-      `${labelName.replace(/\s+/g, '_')}_${Date.now()}.pdf`,
-    );
-
-    await page.pdf({
-      path: pdfPath,
+    // Generate PDF in memory
+    const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
       margin: {
@@ -213,10 +201,11 @@ export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams
 
     await browser.close();
 
-    // Read the generated PDF and remove last 2 pages
-    const pdfBytes = await readFile(pdfPath);
-    const pdfDoc = await PDFDocument.load(new Uint8Array(pdfBytes));
+    // Process the PDF in memory
+    const pdfDoc = await PDFDocument.load(pdfBuffer);
     const pageCount = pdfDoc.getPageCount();
+
+    let finalPdfBuffer = pdfBuffer;
 
     if (pageCount > 2) {
       const pagesToKeep = pageCount - 2;
@@ -227,21 +216,14 @@ export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams
       );
       copiedPages.forEach((page) => newPdfDoc.addPage(page));
 
-      const modifiedPdfBytes = await newPdfDoc.save();
-      await writeFile(pdfPath, modifiedPdfBytes);
+      const pdfBytes = await newPdfDoc.save();
+      finalPdfBuffer = new Uint8Array(Buffer.from(pdfBytes));
     }
 
-    // Read the final PDF file
-    const pdfBuffer = await readFile(pdfPath);
-
     // Create a File object from the buffer
-    const pdfFile = new File([pdfBuffer], `${labelName.replace(/\s+/g, '_')}.pdf`, {
+    const pdfFile = new File([finalPdfBuffer], `${labelName.replace(/\s+/g, '_')}.pdf`, {
       type: 'application/pdf',
     });
-
-    // Clean up temporary files
-    await unlink(pdfPath);
-    await unlink(tempHtmlPath);
 
     return {
       success: true,

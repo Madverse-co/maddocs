@@ -142,3 +142,43 @@ const getS3Client = () => {
       : undefined,
   });
 };
+
+export const getS3File = async (key: string): Promise<Buffer | null> => {
+  const UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
+
+  if (UPLOAD_TRANSPORT !== 's3') {
+    throw new Error('S3 transport not configured');
+  }
+
+  const client = getS3Client();
+
+  try {
+    const command = new GetObjectCommand({
+      Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
+      Key: key,
+    });
+
+    const response = await client.send(command);
+
+    if (!response.Body) {
+      return null;
+    }
+
+    // Convert stream to buffer
+    const chunks: Uint8Array[] = [];
+
+    // Use proper typing for the stream
+    const stream = response.Body.transformToWebStream();
+    const reader = stream.getReader();
+
+    let result;
+    while (!(result = await reader.read()).done) {
+      chunks.push(result.value);
+    }
+
+    return Buffer.concat(chunks);
+  } catch (error) {
+    console.error(`Error retrieving file from S3: ${error}`);
+    return null;
+  }
+};
