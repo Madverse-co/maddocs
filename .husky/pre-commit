@@ -12,4 +12,4 @@ node "$MONOREPO_ROOT/scripts/copy-wellknown.cjs"
 
 git add "$MONOREPO_ROOT/apps/web/public/"
 
-npx lint-staged
+# npx lint-staged

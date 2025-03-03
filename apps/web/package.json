@@ -72,6 +72,8 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",
-    "typescript": "5.6.2"
+    "typescript": "5.6.2",
+    "@sparticuz/chromium-min": "^132.0.0",
+    "puppeteer-core": "^24.3.0"
   }
 }

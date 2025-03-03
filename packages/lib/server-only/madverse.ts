@@ -1,5 +1,6 @@
+import chromium from '@sparticuz/chromium-min';
 import { PDFDocument } from 'pdf-lib';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 
 import { labelInvite } from './madverse-templates';
 
@@ -141,9 +142,14 @@ export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams
 
     // Use puppeteer in memory without writing to disk
     const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Required for serverless
+      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(
+        `https://github.com/Sparticuz/chromium/releases/download/v132.0.0/chromium-v132.0.0-pack.tar`,
+      ),
+      headless: 'shell',
     });
+    console.log('generatePdf: Browser launched');
     const page = await browser.newPage();
 
     // Load HTML content directly instead of from file
