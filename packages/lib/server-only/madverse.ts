@@ -1,5 +1,4 @@
 import chromium from '@sparticuz/chromium-min';
-import { PDFDocument } from 'pdf-lib';
 import puppeteer from 'puppeteer';
 import { type Browser } from 'puppeteer';
 import { type Browser as BrowserCore } from 'puppeteer-core';
@@ -9,6 +8,7 @@ import { labelInvite } from './madverse-templates';
 interface GeneratePdfParams {
   labelName: string;
   labelAddress: string;
+  royaltySplit: number;
 }
 
 interface CreateDocumentRecipient {
@@ -55,7 +55,50 @@ export async function createDocument(payload: CreateDocumentPayload) {
   }
 }
 
-export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams) {
+function numberToWords(n: number) {
+  if (n < 0) return false;
+  const single_digit = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+  const double_digit = [
+    'Ten',
+    'Eleven',
+    'Twelve',
+    'Thirteen',
+    'Fourteen',
+    'Fifteen',
+    'Sixteen',
+    'Seventeen',
+    'Eighteen',
+    'Nineteen',
+  ];
+  const below_hundred = [
+    'Twenty',
+    'Thirty',
+    'Forty',
+    'Fifty',
+    'Sixty',
+    'Seventy',
+    'Eighty',
+    'Ninety',
+  ];
+  let word = '';
+  if (n === 0) return 'Zero';
+  function translate(n: number) {
+    word = '';
+    if (n < 10) {
+      word = single_digit[n] + ' ';
+    } else if (n < 20) {
+      word = double_digit[n - 10] + ' ';
+    } else if (n < 100) {
+      const rem = translate(n % 10);
+      word = below_hundred[(n - (n % 10)) / 10 - 2] + ' ' + rem;
+    }
+    return word;
+  }
+  const result = translate(n);
+  return result.trim();
+}
+
+export async function generatePdf({ labelName, labelAddress, royaltySplit }: GeneratePdfParams) {
   try {
     let htmlContent = labelInvite;
 
@@ -89,38 +132,6 @@ export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams
         .page-break {
           page-break-after: always;
         }
-        
-        /* Add signature box styles */
-        .signature-box {
-          display: inline-block;
-          width: 150px;
-          height: 40px;
-          background-color: #f5f5f5;
-          border: 1px solid #ddd;
-          margin-left: 10px;
-          vertical-align: middle;
-        }
-        .name-box {
-          display: inline-block;
-          width: 150px;
-          height: 40px;
-          background-color: #f5f5f5;
-          border: 1px solid #ddd;
-          margin-left: 10px;
-          vertical-align: middle;
-        }
-        .date-box {
-          display: inline-block;
-          width: 150px;
-          height: 40px;
-          background-color: #f5f5f5;
-        }
-        .today-date-box {
-          display: inline-block;
-          width: 150px;
-          height: 40px;
-          background-color: #f5f5f5;
-        }
       </style>
     `;
 
@@ -136,12 +147,16 @@ export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams
     htmlContent = htmlContent.replace('<span class="today-date-box"></span>', todayDate);
 
     // Replace the placeholder content
-    htmlContent = htmlContent.replace('Compass Box Studio', labelName);
-    htmlContent = htmlContent.replace('307, Off, Airport Rd, behind', '');
+    htmlContent = htmlContent.replace('[Label Name]', labelName);
     htmlContent = htmlContent.replace(
-      'C.S.D. Depot, Sardarnagar, Ahmedabad Cantonment, Ahmedabad, Gujarat 380004',
-      labelAddress,
+      'with registered address at [Label Address]',
+      `with registered address at ${labelAddress}`,
     );
+    htmlContent = htmlContent.replace(
+      'xxx% (xxx percent)',
+      `${royaltySplit}% (${numberToWords(royaltySplit)} percent)`,
+    );
+    htmlContent = htmlContent.replace('[Date]', todayDate);
 
     let browser: Browser | BrowserCore;
     if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
@@ -219,26 +234,7 @@ export async function generatePdf({ labelName, labelAddress }: GeneratePdfParams
     await browser.close();
 
     // Process the PDF in memory
-    const pdfDoc = await PDFDocument.load(pdfBuffer);
-    const pageCount = pdfDoc.getPageCount();
-
-    let finalPdfBuffer = pdfBuffer;
-
-    if (pageCount > 2) {
-      const pagesToKeep = pageCount - 2;
-      const newPdfDoc = await PDFDocument.create();
-      const copiedPages = await newPdfDoc.copyPages(
-        pdfDoc,
-        Array.from({ length: pagesToKeep }, (_, i) => i),
-      );
-      copiedPages.forEach((page) => newPdfDoc.addPage(page));
-
-      const pdfBytes = await newPdfDoc.save();
-      finalPdfBuffer = new Uint8Array(Buffer.from(pdfBytes));
-    }
-
-    // Create a File object from the buffer
-    const pdfFile = new File([finalPdfBuffer], `${labelName.replace(/\s+/g, '_')}.pdf`, {
+    const pdfFile = new File([pdfBuffer], `${labelName.replace(/\s+/g, '_')}.pdf`, {
       type: 'application/pdf',
     });
 

@@ -28,8 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { labelName, labelAddress, labelEmail } = req.body;
-    const pdfFile = await generatePdf({ labelName, labelAddress });
+    const { labelName, labelAddress, labelEmail, royaltySplit } = req.body;
+    const pdfFile = await generatePdf({ labelName, labelAddress, royaltySplit });
 
     if (!pdfFile.success || !pdfFile.file) {
       return res.status(500).json({ error: 'Failed to generate PDF' });
