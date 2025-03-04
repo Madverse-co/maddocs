@@ -1,4 +1,5 @@
 import chromium from '@sparticuz/chromium-min';
+import { Client } from '@upstash/qstash';
 import puppeteer from 'puppeteer';
 import { type Browser } from 'puppeteer';
 import { type Browser as BrowserCore } from 'puppeteer-core';
@@ -253,34 +254,33 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
   }
 }
 
-export async function sendDocument(documentId: string) {
+export const addEventToQueue = async (
+  url: string,
+  body: Record<string, unknown>,
+  deduplicationId?: string,
+  queue?: string,
+  notBefore?: number, // milliseconds
+) => {
   try {
-    const response = await fetch(`/api/v1/documents/${documentId}/send`, {
-      method: 'POST',
-      headers: {
-        Authorization: process.env.ADMIN_ACCOUNT_API_KEY ?? '',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sendEmail: true,
-      }),
+    const qstash = new Client({
+      token: process.env.QSTASH_TOKEN,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to send document');
-    }
-
-    const data = await response.json();
-    return {
-      success: true,
-      data,
-    };
+    await qstash.publishJSON({
+      url,
+      body,
+      queue,
+      deduplicationId,
+      notBefore,
+    });
   } catch (error) {
-    console.error('Document sending failed:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to send document',
-    };
+    console.error('Error in adding event to qstash queue : ', {
+      error: error,
+      url,
+      body,
+      queue,
+      deduplicationId,
+      notBefore,
+    });
   }
-}
+};

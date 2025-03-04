@@ -4,6 +4,7 @@ import { initClient } from '@ts-rest/core';
 
 import { ApiContractV1 } from '@documenso/api/v1/contract';
 import { generatePdf } from '@documenso/lib/server-only/madverse';
+import { addEventToQueue } from '@documenso/lib/server-only/madverse';
 
 export const config = {
   maxDuration: 60,
@@ -143,6 +144,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (sendDocumentResponse.status !== 200) {
       return res.status(500).json({ error: 'Failed to send document via email' });
+    }
+
+    // Schedule reminder emails via QStash
+    const reminderUrl = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/madverse/resend-label-invite`;
+    const reminderData = {
+      documentId: String(documentId),
+      labelName,
+      labelEmail,
+    };
+
+    // Schedule reminders for 2, 4, 6, 8, and 10 days from now
+    for (let day = 2; day <= 10; day += 2) {
+      const notBefore = Date.now() + day * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+      const deduplicationId = `reminder-${documentId}-day-${day}`;
+
+      await addEventToQueue(
+        reminderUrl,
+        reminderData,
+        deduplicationId,
+        'document-reminders',
+        notBefore,
+      );
     }
 
     return res.status(200).json({
