@@ -17,7 +17,7 @@ const defaultBrandingContextValue: BrandingContextValue = {
   brandingUrl: '',
   brandingLogo: '',
   brandingCompanyDetails: '',
-  brandingHidePoweredBy: false,
+  brandingHidePoweredBy: true,
 };
 
 export const BrandingProvider = (props: {

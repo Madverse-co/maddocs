@@ -50,10 +50,6 @@ export const DocumentInviteEmailTemplate = ({
     previewText = msg`Please ${action} your document ${documentName}`;
   }
 
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
-
   return (
     <Html>
       <Head />
@@ -63,15 +59,11 @@ export const DocumentInviteEmailTemplate = ({
         <Section>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
             <Section>
-              {branding.brandingEnabled && branding.brandingLogo ? (
-                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
-              ) : (
-                <Img
-                  src={getAssetUrl('/static/logo.png')}
-                  alt="Maddocs Logo"
-                  className="mb-4 h-6"
-                />
-              )}
+              <Img
+                src={'https://app.madverse.co/assets/madverse_logo_mini.svg'}
+                alt="Maddocs Logo"
+                className="mb-4 h-6"
+              />
 
               <TemplateDocumentInvite
                 inviterName={inviterName}

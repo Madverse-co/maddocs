@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro';
 
-import { Link, Section, Text } from '../components';
+import { Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 
 export type TemplateFooterProps = {
@@ -16,9 +16,9 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
         <Text className="my-4 text-base text-slate-400">
           <Trans>
             This document was sent using{' '}
-            <Link className="text-[#7AC455]" href="https://documen.so/mail-footer">
+            <Text className="text-[#7AC455]">
               Maddocs.
-            </Link>
+            </Text>
           </Trans>
         </Text>
       )}
@@ -35,10 +35,10 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
           })}
         </Text>
       ) : (
-        <Text className="my-8 text-sm text-slate-400">
-          Maddocs, Inc.
+        <Text className="my-8 text-sm text-slate-400"> 
+          Nesho Entertainment Private Limited
           <br />
-          2261 Market Street, #5211, San Francisco, CA 94114, USA
+          Golf View Corporate Tower, Sector 42, Gurugram, Haryana 122002, India
         </Text>
       )}
     </Section>

@@ -8,7 +8,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { signOut } from 'next-auth/react';
 
-import LogoImage from '@documenso/assets/logo.png';
+import LogoImage from '@documenso/assets/logo.svg';
 import { getRootHref } from '@documenso/lib/utils/params';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';

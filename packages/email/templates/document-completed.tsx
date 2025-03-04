@@ -39,7 +39,7 @@ export const DocumentCompletedEmailTemplate = ({
                 <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
               ) : (
                 <Img
-                  src={getAssetUrl('/static/logo.png')}
+                  src={getAssetUrl('/static/logo.svg')}
                   alt="Maddocs Logo"
                   className="mb-4 h-6"
                 />
