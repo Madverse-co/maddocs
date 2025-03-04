@@ -184,8 +184,8 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
 
     // Get coordinates of signature boxes
     const signBoxCoordinates = {
-      x: 21,
-      y: 16.02,
+      x: 30.7,
+      y: 65.2,
       width: 15.5,
       height: 4,
       marker: 'SIGNATURE',
@@ -193,8 +193,8 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     };
 
     const nameBoxCoordinates = {
-      x: 21,
-      y: 23.65,
+      x: 30.7,
+      y: 70.7,
       width: 15.5,
       height: 4,
       marker: 'NAME',
@@ -202,8 +202,8 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     };
 
     const dateBoxCoordinates = {
-      x: 21,
-      y: 30.1,
+      x: 30.7,
+      y: 72.7,
       width: 15.5,
       height: 4,
       marker: 'DATE',
@@ -212,8 +212,8 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
 
     const signatureBoxCoordinates = [signBoxCoordinates, nameBoxCoordinates, dateBoxCoordinates];
     const madverseSignatureBoxCoordinates = {
-      x: 75,
-      y: 16.02,
+      x: 69.6,
+      y: 65.2,
       width: 15.5,
       height: 4,
       marker: 'SIGNATURE',
