@@ -46,6 +46,8 @@ export const getPresignPostUrl = async (fileName: string, contentType: string) =
     key = `${token.id}/${key}`;
   }
 
+  key = `agreements/${key}`;
+
   const putObjectCommand = new PutObjectCommand({
     Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
     Key: key,
