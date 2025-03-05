@@ -52,7 +52,9 @@ export const DocumentsDataTable = ({
       },
       {
         header: _(msg`Title`),
-        cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
+        cell: ({ row }) => (
+          <DataTableTitle row={{ ...row.original, lastResentAt: null }} teamUrl={team?.url} />
+        ),
       },
       {
         id: 'sender',
@@ -80,8 +82,8 @@ export const DocumentsDataTable = ({
         cell: ({ row }) =>
           (!row.original.deletedAt || row.original.status === ExtendedDocumentStatus.COMPLETED) && (
             <div className="flex items-center gap-x-4">
-              <DataTableActionButton team={team} row={row.original} />
-              <DataTableActionDropdown team={team} row={row.original} />
+              <DataTableActionButton team={team} row={{ ...row.original, lastResentAt: null }} />
+              <DataTableActionDropdown team={team} row={{ ...row.original, lastResentAt: null }} />
             </div>
           ),
       },

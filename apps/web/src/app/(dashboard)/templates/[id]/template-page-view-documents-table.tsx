@@ -107,7 +107,9 @@ export const TemplatePageViewDocumentsTable = ({
       },
       {
         header: _(msg`Title`),
-        cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
+        cell: ({ row }) => (
+          <DataTableTitle row={{ ...row.original, lastResentAt: null }} teamUrl={team?.url} />
+        ),
       },
 
       {
@@ -175,9 +177,9 @@ export const TemplatePageViewDocumentsTable = ({
         header: _(msg`Actions`),
         cell: ({ row }) => (
           <div className="flex items-center space-x-2">
-            <DataTableActionButton team={team} row={row.original} />
+            <DataTableActionButton team={team} row={{ ...row.original, lastResentAt: null }} />
 
-            <DataTableActionDropdown team={team} row={row.original} />
+            <DataTableActionDropdown team={team} row={{ ...row.original, lastResentAt: null }} />
           </div>
         ),
       },
