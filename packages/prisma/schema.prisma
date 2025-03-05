@@ -335,7 +335,7 @@ model Document {
   templateId     Int?
   template       Template?           @relation(fields: [templateId], references: [id], onDelete: SetNull)
   source         DocumentSource
-
+  lastResentAt   DateTime?
   auditLogs DocumentAuditLog[]
 
   @@unique([documentDataId])
