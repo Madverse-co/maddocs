@@ -42,7 +42,7 @@ export const seedDatabase = async () => {
       email: 'support@madverse.it',
     },
     create: {
-      name: 'Madverse Support',
+      name: 'Madverse',
       email: 'support@madverse.it',
       emailVerified: new Date(),
       password: hashSync('superSafePassword'),
