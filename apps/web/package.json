@@ -65,6 +65,7 @@
     "@lingui/loader": "^4.11.3",
     "@lingui/swc-plugin": "4.0.8",
     "@simplewebauthn/types": "^9.0.1",
+    "@sparticuz/chromium-min": "^132.0.0",
     "@types/formidable": "^2.0.6",
     "@types/luxon": "^3.3.1",
     "@types/node": "^20",
@@ -72,9 +73,9 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",
-    "typescript": "5.6.2",
-    "@sparticuz/chromium-min": "^132.0.0",
+    "@upstash/qstash": "^2.5.4",
+    "prisma-json-types-generator": "^3.2.2",
     "puppeteer-core": "^24.3.0",
-    "@upstash/qstash": "^2.5.4"
+    "typescript": "5.6.2"
   }
 }
