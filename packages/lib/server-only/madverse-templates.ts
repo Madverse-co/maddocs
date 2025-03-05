@@ -105,7 +105,6 @@ export const labelInvite = `<!DOCTYPE html>
       #l1 > li > *:first-child:before {
         counter-increment: c1;
         content: counter(c1, decimal) ". ";
-        font-weight: bold;
       }
       #l1 > li:first-child > *:first-child:before {
         counter-increment: c1 0;

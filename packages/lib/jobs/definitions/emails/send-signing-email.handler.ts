@@ -122,7 +122,7 @@ export const run = async ({
       emailMessage = i18n._(
         team.teamGlobalSettings?.includeSenderDetails
           ? msg`${user.name} on behalf of "${team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`
-          : msg`${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+          : msg`${team.name} has invited you ${name ? ` ${name}` : ''} to ${recipientActionVerb} the document "${document.title}".`,
       );
     }
   }

@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { labelName, labelAddress, labelEmail, royaltySplit } = req.body;
+    const { labelName, labelAddress, labelEmail, royaltySplit, usersName } = req.body;
     const pdfFile = await generatePdf({ labelName, labelAddress, royaltySplit });
 
     if (!pdfFile.success || !pdfFile.file) {
@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         signingOrder: 1,
       },
       {
-        name: labelName,
+        name: usersName,
         email: labelEmail,
         role: 'SIGNER' as const,
         signingOrder: 2,
@@ -60,8 +60,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const doc = await client.createDocument({
       body: {
-        title: `${labelName} - Executive Plan Agreement`,
+        title: `Madverse Label Enterprise Plan Agreement`,
         recipients,
+        meta: {
+          subject: `Please sign the Madverse Label Enterprise Plan Agreement`,
+          message: `Madverse has invited you ${labelName} to sign the Madverse Label Enterprise Plan Agreement`,
+        },
       },
     });
 
@@ -136,6 +140,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const sendDocumentResponse = await client.sendDocument({
       body: {
         sendEmail: true,
+        sendCompletionEmails: true,
       },
       params: {
         id: String(documentId),
