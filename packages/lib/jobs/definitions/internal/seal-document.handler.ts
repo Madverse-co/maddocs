@@ -235,32 +235,33 @@ export const run = async ({
     }
 
     if (shouldSendCompletedEmail) {
-    
       // Send webhook POST request to madverse for each recipient
       const recipients = document.recipients;
-      
+
       // Get recipient details and send to webhook
       await Promise.all(
         recipients.map(async (recipient) => {
           try {
             // Send webhook with recipient details
-            const response = await fetch(`${process.env.MADVERSE_DOMAIN}/api/agreements-webhook`, {
+            const response = await fetch(`${process.env.MADVERSE_DOMAIN}/api/agreement-webhook`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.MADVERSE_WEBHOOK_KEY}`
+                Authorization: `Bearer ${process.env.MADVERSE_WEBHOOK_KEY}`,
               },
               body: JSON.stringify({
                 name: recipient.name.split(' - ')[0],
                 label: recipient.name.split(' - ')[1],
-                email: recipient.email
-              })
+                email: recipient.email,
+              }),
             });
-            
+
             if (!response.ok) {
               const errorText = await response.text().catch(() => 'Unknown error');
-              console.error(`Failed to send webhook for recipient ${recipient.email}: HTTP ${response.status} - ${errorText}`);
-              
+              console.error(
+                `Failed to send webhook for recipient ${recipient.email}: HTTP ${response.status} - ${errorText}`,
+              );
+
               // Just log to console instead of creating an audit log with invalid fields
               console.error(
                 `Webhook to Madverse failed for document ${document.id}, recipient ${recipient.email}: HTTP ${response.status} - ${errorText}`,
@@ -273,15 +274,15 @@ export const run = async ({
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             console.error(`Error sending webhook for recipient ${recipient.email}:`, errorMessage);
-            
+
             // Just log to console instead of creating an audit log with invalid fields
             console.error(
               `Error sending webhook to Madverse for document ${document.id}, recipient ${recipient.email}: ${errorMessage}`,
             );
           }
-        })
+        }),
       );
-      
+
       await sendCompletedEmail({ documentId, requestMetadata });
     }
   });

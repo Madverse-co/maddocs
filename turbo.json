@@ -35,7 +35,12 @@
       "cache": false
     }
   },
-  "globalDependencies": ["**/.env.*local", "ADMIN_ACCOUNT_API_KEY"],
+  "globalDependencies": [
+    "**/.env.*local",
+    "ADMIN_ACCOUNT_API_KEY",
+    "MADVERSE_DOMAIN",
+    "MADVERSE_WEBHOOK_KEY"
+  ],
   "globalEnv": [
     "APP_VERSION",
     "NEXT_PRIVATE_ENCRYPTION_KEY",
@@ -134,6 +139,8 @@
     "ADMIN_ACCOUNT_API_KEY",
     "ADMIN_ACCOUNT_EMAIL",
     "POSTMARK_API_TOKEN",
-    "QSTASH_TOKEN"
+    "QSTASH_TOKEN",
+    "MADVERSE_DOMAIN",
+    "MADVERSE_WEBHOOK_KEY"
   ]
 }
