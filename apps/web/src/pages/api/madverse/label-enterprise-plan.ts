@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const recipients = [
       {
         name: 'Rohan Nesho Jain',
-        email: 'madverse@madverse.co',
+        email: 'support@madverse.it',
         role: 'SIGNER' as const,
         signingOrder: 1,
       },
