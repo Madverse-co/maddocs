@@ -235,6 +235,7 @@ export class LocalJobProvider extends BaseJobProvider {
     }
 
     console.log('Submitting job to endpoint:', endpoint);
+    console.log('HI SAYARRRR');
     await Promise.race([
       fetch(endpoint, {
         method: 'POST',
