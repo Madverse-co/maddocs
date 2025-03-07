@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         signingOrder: 1,
       },
       {
-        name: usersName,
+        name: `${usersName} - ${labelName}`,
         email: labelEmail,
         role: 'SIGNER' as const,
         signingOrder: 2,
