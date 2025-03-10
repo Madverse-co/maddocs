@@ -89,7 +89,7 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Webhook-Key': process.env.MADVERSE_WEBHOOK_KEY || '',
+        Authorization: `Bearer ${process.env.MADVERSE_WEBHOOK_KEY}`,
       },
       body: JSON.stringify({
         event: 'AGREEMENT_SIGNED_BY_USER',
