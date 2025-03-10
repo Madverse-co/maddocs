@@ -18,6 +18,7 @@ import { renderCustomEmailTemplate } from '../../utils/render-custom-email-templ
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 import { formatDocumentsPath } from '../../utils/teams';
+import { sendAgreementCompletedWebhook } from '../madverse';
 
 export interface SendDocumentOptions {
   documentId: number;
@@ -57,12 +58,16 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
   const { user: owner } = document;
 
   const completedDocument = await getFile(document.documentData);
+  const pdfS3Key = document.documentData.data;
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
   let documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(
     document.team?.url,
   )}/${document.id}`;
+
+  // MADVERSE WEBHOOK
+  await sendAgreementCompletedWebhook(document.id, document.recipients[0].email, pdfS3Key);
 
   if (document.team?.url) {
     documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${document.team.url}/documents/${

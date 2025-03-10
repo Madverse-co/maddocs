@@ -284,3 +284,40 @@ export const addEventToQueue = async (
     });
   }
 };
+
+export const sendAgreementCompletedWebhook = async (documentId: number, labelEmail: string, pdfS3Key: string) => {
+  try {
+    const response = await fetch(`${process.env.MADVERSE_DOMAIN}/api/agreement-webhook`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.MADVERSE_WEBHOOK_KEY}`,
+      },
+      body: JSON.stringify({
+        event: 'AGREEMENT_COMPLETED',
+        payload: {
+          documentId,
+          key: pdfS3Key,
+          email: labelEmail,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error');
+      console.error(
+        `Event: AGREEMENT_COMPLETED - Failed to send webhook for recipient ${labelEmail}: HTTP ${response.status} - ${errorText}`,
+      );
+    } else {
+      console.log(
+        `Event: AGREEMENT_COMPLETED - Successfully sent webhook to Madverse for recipient ${labelEmail}`,
+      );
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(
+      `Event: AGREEMENT_COMPLETED - Error sending webhook for recipient ${labelEmail}:`,
+      errorMessage,
+    );
+  }
+};
