@@ -38,14 +38,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const recipients = [
       {
-        name: 'Rohan Nesho Jain',
-        email: 'support@madverse.it',
+        name: `${usersName} - ${labelName}`,
+        email: labelEmail,
         role: 'SIGNER' as const,
         signingOrder: 1,
       },
       {
-        name: `${usersName} - ${labelName}`,
-        email: labelEmail,
+        name: 'Rohan Nesho Jain',
+        email: 'support@madverse.it',
         role: 'SIGNER' as const,
         signingOrder: 2,
       },
@@ -65,6 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         meta: {
           subject: `Please sign the Madverse Label Enterprise Plan Agreement`,
           message: `Madverse has invited you ${labelName} to sign the Madverse Label Enterprise Plan Agreement`,
+          signingOrder: 'SEQUENTIAL',
         },
       },
     });
@@ -95,7 +96,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const madverseCoordinates = pdfFile.madverseSignatureBoxCoordinates;
 
     const coordinates = userCoordinates.map((coord) => ({
-      recipientId: Number(recipientData[1].recipientId),
+      recipientId: Number(recipientData[0].recipientId),
       type: getFieldTypeFromMarker(coord.marker),
       pageNumber: coord.pageNumber || 1,
       pageX: coord.x,
@@ -105,7 +106,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }));
 
     coordinates.push({
-      recipientId: Number(recipientData[0].recipientId),
+      recipientId: Number(recipientData[1].recipientId),
       type: getFieldTypeFromMarker(madverseCoordinates.marker),
       pageNumber: madverseCoordinates.pageNumber || 1,
       pageX: madverseCoordinates.x,
