@@ -85,6 +85,22 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
       return;
     }
 
+    await fetch(`${process.env.MADVERSE_DOMAIN}/api/agreement-webhook`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Webhook-Key': process.env.MADVERSE_WEBHOOK_KEY || '',
+      },
+      body: JSON.stringify({
+        event: 'AGREEMENT_SIGNED_BY_USER',
+        payload: {
+          name: recipientName.split(' - ')[0],
+          label: recipientName.split(' - ')[1],
+          email: recipientEmail,
+        },
+      }),
+    });
+
     const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
     const i18n = await getI18nInstance(document.documentMeta?.language);
 
