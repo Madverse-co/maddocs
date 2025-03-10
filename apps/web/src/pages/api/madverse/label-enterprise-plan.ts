@@ -176,6 +176,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       success: true,
+      documentId,
       signingUrl: recipientData[1].signingUrl,
     });
   } catch (error) {
