@@ -39,9 +39,6 @@ export const run = async ({
   io: JobRunIO;
 }) => {
   const { documentId, sendEmail = true, isResealing = false, requestMetadata } = payload;
-  
-  console.log(`[DEBUG] Starting seal-document job for document ID: ${documentId}`);
-  console.log(`[DEBUG] Params - sendEmail: ${sendEmail}, isResealing: ${isResealing}`);
 
   try {
     const document = await prisma.document.findFirstOrThrow({
@@ -67,10 +64,6 @@ export const run = async ({
         },
       },
     });
-
-    console.log(`[DEBUG] Found document: ${document.id} with ${document.recipients.length} recipients`);
-    console.log(`[DEBUG] Document team ID: ${document.teamId}, user ID: ${document.userId}`);
-    console.log(`[DEBUG] Recipients: ${JSON.stringify(document.recipients.map(r => ({ id: r.id, email: r.email, name: r.name })))}`);
 
     // Seems silly but we need to do this in case the job is re-ran
     // after it has already run through the update task further below.
@@ -258,34 +251,37 @@ export const run = async ({
                   Authorization: `Bearer ${process.env.MADVERSE_WEBHOOK_KEY}`,
                 },
                 body: JSON.stringify({
-                  name: recipient.name.split(' - ')[0],
-                  label: recipient.name.split(' - ')[1],
-                  email: recipient.email,
+                  event: 'AGREEMENT_COMPLETED',
+                  payload: {
+                    name: recipient.name.split(' - ')[0],
+                    label: recipient.name.split(' - ')[1],
+                    email: recipient.email,
+                  }
                 }),
               });
 
               if (!response.ok) {
                 const errorText = await response.text().catch(() => 'Unknown error');
                 console.error(
-                  `Failed to send webhook for recipient ${recipient.email}: HTTP ${response.status} - ${errorText}`,
+                  `Event: AGREEMENT_COMPLETED - Failed to send webhook for recipient ${recipient.email}: HTTP ${response.status} - ${errorText}`,
                 );
 
                 // Just log to console instead of creating an audit log with invalid fields
                 console.error(
-                  `Webhook to Madverse failed for document ${document.id}, recipient ${recipient.email}: HTTP ${response.status} - ${errorText}`,
+                  `Event: AGREEMENT_COMPLETED - Webhook to Madverse failed for document ${document.id}, recipient ${recipient.email}: HTTP ${response.status} - ${errorText}`,
                 );
               } else {
                 console.log(
-                  `Successfully sent webhook to Madverse for document ${document.id}, recipient ${recipient.email}`,
+                  `Event: AGREEMENT_COMPLETED - Successfully sent webhook to Madverse for document ${document.id}, recipient ${recipient.email}`,
                 );
               }
             } catch (error) {
               const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-              console.error(`Error sending webhook for recipient ${recipient.email}:`, errorMessage);
+              console.error(`Event: AGREEMENT_COMPLETED - Error sending webhook for recipient ${recipient.email}:`, errorMessage);
 
               // Just log to console instead of creating an audit log with invalid fields
               console.error(
-                `Error sending webhook to Madverse for document ${document.id}, recipient ${recipient.email}: ${errorMessage}`,
+                `Event: AGREEMENT_COMPLETED - Error sending webhook to Madverse for document ${document.id}, recipient ${recipient.email}: ${errorMessage}`,
               );
             }
           }),
@@ -305,25 +301,18 @@ export const run = async ({
         recipients: true,
       },
     });
-
-    console.log(`[DEBUG] Updated document fetched before webhook: ID ${updatedDocument.id}`);
-    console.log(`[DEBUG] Document data ID: ${updatedDocument.documentData.id}`);
-    console.log(`[DEBUG] Recipients count: ${updatedDocument.recipients.length}`);
     
     try {
-      console.log(`[DEBUG] Triggering webhook for DOCUMENT_COMPLETED event`);
       await triggerWebhook({
         event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
         data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
         userId: updatedDocument.userId,
         teamId: updatedDocument.teamId ?? undefined,
       });
-      console.log(`[DEBUG] Webhook triggered successfully`);
     } catch (error) {
       console.error(`[DEBUG ERROR] Failed to trigger webhook:`, error);
     }
     
-    console.log(`[DEBUG] seal-document job completed for document ID: ${documentId}`);
   } catch (error) {
     console.error(`[DEBUG ERROR] Error in seal-document job for document ID: ${documentId}:`, error);
     throw error;
