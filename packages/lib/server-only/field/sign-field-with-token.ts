@@ -26,6 +26,7 @@ import {
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { validateFieldAuth } from '../document/validate-field-auth';
+import { sendLabelXArtistWebhook } from '../madverse';
 
 export type SignFieldWithTokenOptions = {
   token: string;
@@ -297,6 +298,8 @@ export const signFieldWithToken = async ({
       }),
     });
 
+    // Madverse Logic
+    await sendLabelXArtistWebhook(document.id, recipient.email);
     return updatedField;
   });
 };
