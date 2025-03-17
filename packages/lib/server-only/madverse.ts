@@ -285,7 +285,17 @@ export const addEventToQueue = async (
   }
 };
 
-export const sendAgreementCompletedWebhook = async (documentId: number, labelEmail: string, pdfS3Key: string) => {
+enum AgreementEventType {
+  AGREEMENT_SIGNED_BY_USER = 'AGREEMENT_SIGNED_BY_USER',
+  AGREEMENT_COMPLETED = 'AGREEMENT_COMPLETED',
+  LABEL_ARTIST_AGREEMENT_SIGNED = 'LABEL_ARTIST_AGREEMENT_SIGNED',
+}
+
+export const sendAgreementCompletedWebhook = async (
+  documentId: number,
+  labelEmail: string,
+  pdfS3Key: string,
+) => {
   try {
     const response = await fetch(`${process.env.MADVERSE_DOMAIN}/api/agreement-webhook`, {
       method: 'POST',
@@ -294,7 +304,7 @@ export const sendAgreementCompletedWebhook = async (documentId: number, labelEma
         Authorization: `Bearer ${process.env.MADVERSE_WEBHOOK_KEY}`,
       },
       body: JSON.stringify({
-        event: 'AGREEMENT_COMPLETED',
+        event: AgreementEventType.AGREEMENT_COMPLETED,
         payload: {
           documentId,
           key: pdfS3Key,
@@ -319,5 +329,37 @@ export const sendAgreementCompletedWebhook = async (documentId: number, labelEma
       `Event: AGREEMENT_COMPLETED - Error sending webhook for recipient ${labelEmail}:`,
       errorMessage,
     );
+  }
+};
+
+export const sendLabelXArtistWebhook = async (documentId: number, recipientEmail: string) => {
+  try {
+    const response = await fetch(`${process.env.MADVERSE_DOMAIN}/api/agreement-webhook`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.MADVERSE_WEBHOOK_KEY}`,
+      },
+      body: JSON.stringify({
+        event: AgreementEventType.LABEL_ARTIST_AGREEMENT_SIGNED,
+        payload: {
+          documentId,
+          email: recipientEmail,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error');
+      console.error(
+        `Event: LABEL_ARTIST_AGREEMENT_SIGNED - Failed to send webhook for recipient ${recipientEmail}: HTTP ${response.status} - ${errorText}`,
+      );
+    } else {
+      console.log(
+        `Event: LABEL_ARTIST_AGREEMENT_SIGNED - Successfully sent webhook to Madverse for recipient ${recipientEmail}`,
+      );
+    }
+  } catch (error) {
+    console.error('Error in sending LabelXArtist webhook:', error);
   }
 };
