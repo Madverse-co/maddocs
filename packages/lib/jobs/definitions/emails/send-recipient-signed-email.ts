@@ -97,6 +97,7 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
           name: recipientName.split(' - ')[0],
           label: recipientName.split(' - ')[1],
           email: recipientEmail,
+          documentId
         },
       }),
     });
