@@ -1,10 +1,9 @@
-import chromium from '@sparticuz/chromium-min';
 import { Client } from '@upstash/qstash';
-import puppeteer from 'puppeteer';
-import { type Browser } from 'puppeteer';
-import { type Browser as BrowserCore } from 'puppeteer-core';
+import Api2Pdf from 'api2pdf';
 
 import { labelInvite } from './madverse-templates';
+
+const api2pdf = new Api2Pdf(process.env.API2PDF_API_KEY ?? '');
 
 interface GeneratePdfParams {
   labelName: string;
@@ -99,6 +98,19 @@ function numberToWords(n: number) {
   return result.trim();
 }
 
+export const generatePDFBuffer = async (html: string) => {
+  const response = await api2pdf.chromeHtmlToPdf(html);
+
+  if (!response.Success) {
+    throw new Error(`Failed to generate PDF: ${response.Error}`);
+  }
+
+  const fileUrl = response.FileUrl;
+  const pdfResponse = await fetch(fileUrl);
+  const pdfBuffer = await pdfResponse.arrayBuffer();
+  return pdfBuffer;
+};
+
 export async function generatePdf({ labelName, labelAddress, royaltySplit }: GeneratePdfParams) {
   try {
     let htmlContent = labelInvite;
@@ -145,94 +157,59 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
       day: 'numeric',
       year: 'numeric',
     });
-    htmlContent = htmlContent.replace('<span class="today-date-box"></span>', todayDate);
+    htmlContent = htmlContent.replace('[Today Date]', todayDate);
+    htmlContent = htmlContent.replace('[Rohan Date]', todayDate);
 
     // Replace the placeholder content
     htmlContent = htmlContent.replace('[Label Name]', labelName);
+    htmlContent = htmlContent.replace('[Label Address]', labelAddress);
     htmlContent = htmlContent.replace(
-      'with registered address at [Label Address]',
-      `with registered address at ${labelAddress}`,
-    );
-    htmlContent = htmlContent.replace(
-      'xxx% (xxx percent)',
+      '[Royalty Split]',
       `${royaltySplit}% (${numberToWords(royaltySplit)} percent)`,
     );
-    htmlContent = htmlContent.replace('[Date]', todayDate);
-
-    let browser: Browser | BrowserCore;
-    if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
-      browser = await puppeteer.launch({
-        args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(
-          `https://github.com/Sparticuz/chromium/releases/download/v132.0.0/chromium-v132.0.0-pack.tar`,
-        ),
-        headless: 'shell',
-      });
-    } else {
-      browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      });
-    }
-
-    console.log('generatePdf: Browser launched');
-    const page = await browser.newPage();
-
-    // Load HTML content directly instead of from file
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
     // Get coordinates of signature boxes
     const signBoxCoordinates = {
-      x: 30.7,
-      y: 65.2,
+      x: 60.5,
+      y: 70.9,
       width: 15.5,
       height: 4,
       marker: 'SIGNATURE',
-      pageNumber: 7,
+      pageNumber: 1,
     };
 
     const nameBoxCoordinates = {
-      x: 30.7,
-      y: 70.7,
-      width: 15.5,
-      height: 4,
+      x: 55,
+      y: 62,
+      width: 17,
+      height: 3,
       marker: 'NAME',
-      pageNumber: 7,
+      pageNumber: 1,
     };
 
     const dateBoxCoordinates = {
-      x: 30.7,
-      y: 72.7,
+      x: 58,
+      y: 65,
       width: 15.5,
-      height: 4,
+      height: 2,
       marker: 'DATE',
-      pageNumber: 7,
+      pageNumber: 1,
     };
 
     const signatureBoxCoordinates = [signBoxCoordinates, nameBoxCoordinates, dateBoxCoordinates];
     const madverseSignatureBoxCoordinates = {
-      x: 69.6,
-      y: 65.2,
+      x: 30.7,
+      y: 70.7,
       width: 15.5,
       height: 4,
       marker: 'SIGNATURE',
-      pageNumber: 7,
+      pageNumber: 1,
     };
 
     // Generate PDF in memory
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '20mm',
-        right: '20mm',
-        bottom: '20mm',
-        left: '20mm',
-      },
-    });
-
-    await browser.close();
+    const pdfBuffer: Uint8Array<ArrayBufferLike> = new Uint8Array(
+      await generatePDFBuffer(htmlContent),
+    );
 
     // Process the PDF in memory
     const pdfFile = new File([pdfBuffer], `${labelName.replace(/\s+/g, '_')}.pdf`, {
