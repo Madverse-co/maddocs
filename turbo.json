@@ -39,7 +39,8 @@
     "**/.env.*local",
     "ADMIN_ACCOUNT_API_KEY",
     "MADVERSE_DOMAIN",
-    "MADVERSE_WEBHOOK_KEY"
+    "MADVERSE_WEBHOOK_KEY",
+    "API2PDF_API_KEY"
   ],
   "globalEnv": [
     "APP_VERSION",
@@ -141,6 +142,7 @@
     "POSTMARK_API_TOKEN",
     "QSTASH_TOKEN",
     "MADVERSE_DOMAIN",
-    "MADVERSE_WEBHOOK_KEY"
+    "MADVERSE_WEBHOOK_KEY",
+    "API2PDF_API_KEY"
   ]
 }
