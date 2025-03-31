@@ -1,6 +1,6 @@
 import { Client } from '@upstash/qstash';
-import Api2Pdf from 'api2pdf';
 
+import Api2Pdf from '../types/pdf';
 import { labelInvite } from './madverse-templates';
 
 const api2pdf = new Api2Pdf(process.env.API2PDF_API_KEY ?? '');
@@ -217,9 +217,7 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     ];
 
     // Generate PDF in memory
-    const pdfBuffer: Uint8Array<ArrayBufferLike> = new Uint8Array(
-      await generatePDFBuffer(htmlContent),
-    );
+    const pdfBuffer = new Uint8Array(await generatePDFBuffer(htmlContent));
 
     // Process the PDF in memory
     const pdfFile = new File([pdfBuffer], `${labelName.replace(/\s+/g, '_')}.pdf`, {
