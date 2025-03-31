@@ -158,7 +158,7 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
       year: 'numeric',
     });
     htmlContent = htmlContent.replace('[Today Date]', todayDate);
-    htmlContent = htmlContent.replace('[Rohan Date]', todayDate);
+    // htmlContent = htmlContent.replace('[Rohan Date]', todayDate);
 
     // Replace the placeholder content
     htmlContent = htmlContent.replace('[Label Name]', labelName);
@@ -171,7 +171,7 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     // Get coordinates of signature boxes
     const signBoxCoordinates = {
       x: 60.5,
-      y: 70.9,
+      y: 67.9,
       width: 15.5,
       height: 4,
       marker: 'SIGNATURE',
@@ -179,8 +179,8 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     };
 
     const nameBoxCoordinates = {
-      x: 55,
-      y: 62,
+      x: 53.8,
+      y: 59.4,
       width: 17,
       height: 3,
       marker: 'NAME',
@@ -188,8 +188,8 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     };
 
     const dateBoxCoordinates = {
-      x: 58,
-      y: 65,
+      x: 53.9,
+      y: 62.4,
       width: 15.5,
       height: 2,
       marker: 'DATE',
@@ -197,14 +197,24 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     };
 
     const signatureBoxCoordinates = [signBoxCoordinates, nameBoxCoordinates, dateBoxCoordinates];
-    const madverseSignatureBoxCoordinates = {
-      x: 30.7,
-      y: 70.7,
-      width: 15.5,
-      height: 4,
-      marker: 'SIGNATURE',
-      pageNumber: 1,
-    };
+    const madverseSignatureBoxCoordinates = [
+      {
+        x: 22.7,
+        y: 67.7,
+        width: 15.5,
+        height: 4,
+        marker: 'SIGNATURE',
+        pageNumber: 1,
+      },
+      {
+        x: 17.14,
+        y: 63.5,
+        width: 15.5,
+        height: 2,
+        marker: 'DATE',
+        pageNumber: 1,
+      },
+    ];
 
     // Generate PDF in memory
     const pdfBuffer: Uint8Array<ArrayBufferLike> = new Uint8Array(

@@ -7,19 +7,19 @@ export const labelInvite = `<!DOCTYPE html>
     <style>
         body {
             font-family: "Inter", sans-serif;
-            margin: 40px;
-            padding: 40px;
+            margin: 0;
+            padding: 0;
             color: #000;
             line-height: 2;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: center;
         }
         .container {
             width: 100%;
-            height: 100%;
-            margin: auto;
+            max-width: 1200px;
+            margin: 40px auto;
             padding: 40px;
         }
         h1 {

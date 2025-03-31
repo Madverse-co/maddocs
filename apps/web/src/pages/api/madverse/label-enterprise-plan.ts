@@ -105,14 +105,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       pageHeight: coord.height || 50,
     }));
 
-    coordinates.push({
-      recipientId: Number(recipientData[1].recipientId),
-      type: getFieldTypeFromMarker(madverseCoordinates.marker),
-      pageNumber: madverseCoordinates.pageNumber || 1,
-      pageX: madverseCoordinates.x,
-      pageY: madverseCoordinates.y,
-      pageWidth: madverseCoordinates.width,
-      pageHeight: madverseCoordinates.height || 50,
+    madverseCoordinates.forEach((coord) => {
+      coordinates.push({
+        recipientId: Number(recipientData[1].recipientId),
+        type: getFieldTypeFromMarker(coord.marker),
+        pageNumber: coord.pageNumber || 1,
+        pageX: coord.x,
+        pageY: coord.y,
+        pageWidth: coord.width,
+        pageHeight: coord.height || 50,
+      });
     });
 
     // Add signature fields to the document
