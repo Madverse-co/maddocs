@@ -102,7 +102,7 @@ export const generatePDFBuffer = async (html: string) => {
   const response = await api2pdf.chromeHtmlToPdf(html);
 
   if (!response.Success) {
-    throw new Error(`Failed to generate PDF: ${response.Error}`);
+    throw new Error(`Failed to generate PDF: ${response}`);
   }
 
   const fileUrl = response.FileUrl;

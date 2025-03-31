@@ -294,7 +294,7 @@ msgstr "{recipientName} ha rechazado el documento '{documentName}'"
 msgid "{recipientReference} has completed signing the document."
 msgstr "{recipientReference} ha completado la firma del documento."
 
-#: packages/lib/jobs/definitions/emails/send-recipient-signed-email.ts:121
+#: packages/lib/jobs/definitions/emails/send-recipient-signed-email.ts:138
 msgid "{recipientReference} has signed \"{0}\""
 msgstr "{recipientReference} ha firmado \"{0}\""
 
@@ -4761,8 +4761,8 @@ msgstr "Certificado de Firma"
 msgid "Signing certificate provided by"
 msgstr "Certificado de firma proporcionado por"
 
-#: packages/lib/server-only/document/send-completed-email.ts:119
-#: packages/lib/server-only/document/send-completed-email.ts:199
+#: packages/lib/server-only/document/send-completed-email.ts:124
+#: packages/lib/server-only/document/send-completed-email.ts:204
 msgid "Signing Complete!"
 msgstr "¡Firma completa!"
 

@@ -294,7 +294,7 @@ msgstr "{recipientName} odrzucił dokument '{documentName}'"
 msgid "{recipientReference} has completed signing the document."
 msgstr "{recipientReference} zakończył podpisywanie dokumentu."
 
-#: packages/lib/jobs/definitions/emails/send-recipient-signed-email.ts:121
+#: packages/lib/jobs/definitions/emails/send-recipient-signed-email.ts:138
 msgid "{recipientReference} has signed \"{0}\""
 msgstr "{recipientReference} podpisał „{0}”"
 
@@ -4761,8 +4761,8 @@ msgstr "Certyfikat podpisu"
 msgid "Signing certificate provided by"
 msgstr "Certyfikat podpisu dostarczony przez"
 
-#: packages/lib/server-only/document/send-completed-email.ts:119
-#: packages/lib/server-only/document/send-completed-email.ts:199
+#: packages/lib/server-only/document/send-completed-email.ts:124
+#: packages/lib/server-only/document/send-completed-email.ts:204
 msgid "Signing Complete!"
 msgstr "Podpisywanie zakończone!"
 
