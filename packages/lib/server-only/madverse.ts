@@ -1,7 +1,8 @@
 import { Client } from '@upstash/qstash';
+// @ts-expect-error api2pdf doesn't have types and for some reason my types aren't recognised by ts.
+import Api2Pdf from 'api2pdf';
 
 import { labelInvite } from './madverse-templates';
-import Api2Pdf from './pdf';
 
 const api2pdf = new Api2Pdf(process.env.API2PDF_API_KEY ?? '');
 
