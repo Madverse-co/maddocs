@@ -1,6 +1,7 @@
 import { Client } from '@upstash/qstash';
 
-import Api2Pdf from '../types/pdf';
+import Api2Pdf from '@documenso/lib/types/pdf';
+
 import { labelInvite } from './madverse-templates';
 
 const api2pdf = new Api2Pdf(process.env.API2PDF_API_KEY ?? '');
