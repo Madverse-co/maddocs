@@ -964,8 +964,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
   }),
 
   createField: authenticatedMiddleware(async (args, user, team) => {
+    console.log('[createField] Starting field creation', {
+      documentId: args.params.id,
+      userId: user.id,
+    });
+
     const { id: documentId } = args.params;
     const fields = Array.isArray(args.body) ? args.body : [args.body];
+    console.log('[createField] Processing fields:', { fieldCount: fields.length });
 
     const document = await prisma.document.findFirst({
       select: { id: true, status: true },
@@ -986,6 +992,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     });
 
     if (!document) {
+      console.log('[createField] Document not found', { documentId });
       return {
         status: 404,
         body: { message: 'Document not found' },
@@ -993,6 +1000,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     if (document.status === DocumentStatus.COMPLETED) {
+      console.log('[createField] Document already completed', { documentId });
       return {
         status: 400,
         body: { message: 'Document is already completed' },
@@ -1000,9 +1008,15 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     try {
+      console.log('[createField] Starting transaction');
       const createdFields = await prisma.$transaction(async (tx) => {
         return Promise.all(
-          fields.map(async (fieldData) => {
+          fields.map(async (fieldData, index) => {
+            console.log(`[createField] Processing field ${index + 1}/${fields.length}`, {
+              type: fieldData.type,
+              recipientId: fieldData.recipientId,
+            });
+
             const {
               recipientId,
               type,
@@ -1015,19 +1029,29 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             } = fieldData;
 
             if (pageNumber <= 0) {
+              console.error('[createField] Invalid page number', { pageNumber });
               throw new Error('Invalid page number');
             }
 
             const recipient = await getRecipientByIdV1Api({
               id: Number(recipientId),
               documentId: Number(documentId),
-            }).catch(() => null);
+            }).catch((err) => {
+              console.error('[createField] Error fetching recipient', {
+                recipientId,
+                documentId,
+                error: err.message,
+              });
+              return null;
+            });
 
             if (!recipient) {
+              console.error('[createField] Recipient not found', { recipientId });
               throw new Error('Recipient not found');
             }
 
             if (recipient.signingStatus === SigningStatus.SIGNED) {
+              console.error('[createField] Recipient already signed', { recipientId });
               throw new Error('Recipient has already signed the document');
             }
 
@@ -1036,12 +1060,17 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             );
 
             if (advancedField && !fieldMeta) {
+              console.error('[createField] Missing field meta for advanced field', { type });
               throw new Error(
                 'Field meta is required for this type of field. Please provide the appropriate field meta object.',
               );
             }
 
             if (fieldMeta && fieldMeta.type.toLowerCase() !== String(type).toLowerCase()) {
+              console.error('[createField] Field meta type mismatch', {
+                expected: type,
+                received: fieldMeta.type,
+              });
               throw new Error('Field meta type does not match the field type');
             }
 
@@ -1063,9 +1092,13 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               .exhaustive();
 
             if (!result.success) {
+              console.error('[createField] Field meta parsing failed', {
+                type,
+              });
               throw new Error('Field meta parsing failed');
             }
 
+            console.log(`[createField] Creating field ${index + 1}`, { type });
             const field = await tx.field.create({
               data: {
                 documentId: Number(documentId),
@@ -1104,6 +1137,9 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               }),
             });
 
+            console.log(`[createField] Successfully created field ${index + 1}`, {
+              fieldId: field.id,
+            });
             return {
               id: field.id,
               documentId: Number(field.documentId),
@@ -1122,6 +1158,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         );
       });
 
+      console.log('[createField] Successfully created all fields', {
+        documentId,
+        fieldCount: createdFields.length,
+      });
       return {
         status: 200,
         body: {
@@ -1130,6 +1170,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         },
       };
     } catch (err) {
+      console.error('[createField] Error creating fields', {
+        documentId,
+        error: err instanceof Error ? err.message : 'Unknown error',
+      });
       return AppError.toRestAPIError(err);
     }
   }),
