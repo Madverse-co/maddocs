@@ -159,7 +159,8 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
       year: 'numeric',
     });
     htmlContent = htmlContent.replace('[Today Date]', todayDate);
-    // htmlContent = htmlContent.replace('[Rohan Date]', todayDate);
+    htmlContent = htmlContent.replace('[Rohan Date]', '');
+    htmlContent = htmlContent.replace('For the Label', `For ${labelName}`);
 
     // Replace the placeholder content
     htmlContent = htmlContent.replace('[Label Name]', labelName);
@@ -173,16 +174,16 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     const signBoxCoordinates = {
       x: 60.5,
       y: 67.9,
-      width: 15.5,
-      height: 4,
+      width: 20,
+      height: 6,
       marker: 'SIGNATURE',
       pageNumber: 1,
     };
 
     const nameBoxCoordinates = {
-      x: 53.8,
+      x: 47.8,
       y: 59.4,
-      width: 17,
+      width: 23,
       height: 3,
       marker: 'NAME',
       pageNumber: 1,
@@ -190,8 +191,8 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
 
     const dateBoxCoordinates = {
       x: 53.9,
-      y: 62.4,
-      width: 15.5,
+      y: 63.4,
+      width: 23,
       height: 2,
       marker: 'DATE',
       pageNumber: 1,
@@ -202,15 +203,15 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
       {
         x: 22.7,
         y: 67.7,
-        width: 15.5,
-        height: 4,
+        width: 20,
+        height: 6,
         marker: 'SIGNATURE',
         pageNumber: 1,
       },
       {
         x: 17.14,
-        y: 63.5,
-        width: 15.5,
+        y: 64.5,
+        width: 23,
         height: 2,
         marker: 'DATE',
         pageNumber: 1,
