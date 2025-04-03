@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { Copy, Sparkles } from 'lucide-react';
+import { Copy } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
@@ -21,7 +21,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '../../primitives/dialog';
 import { useToast } from '../../primitives/use-toast';
 
@@ -120,7 +119,7 @@ export const DocumentShareButton = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
+      {/* <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger?.({
           disabled: !documentId,
           loading: isLoading,
@@ -135,7 +134,7 @@ export const DocumentShareButton = ({
             <Trans>Share Signature Card</Trans>
           </Button>
         )}
-      </DialogTrigger>
+      </DialogTrigger> */}
 
       <DialogContent position="end">
         <DialogHeader>
