@@ -373,6 +373,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         },
       };
     } catch (err) {
+      console.error('[createDocument]: Error -', err);
       return {
         status: 404,
         body: {
