@@ -1010,7 +1010,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     try {
       console.log('[createField] Starting transaction');
       const createdFields = await prisma.$transaction(async (tx) => {
-        return Promise.all(
+        return await Promise.all(
           fields.map(async (fieldData, index) => {
             console.log(`[createField] Processing field ${index + 1}/${fields.length}`, {
               type: fieldData.type,
