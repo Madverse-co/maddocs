@@ -94,20 +94,21 @@ export const getPresignGetUrl = async (key: string) => {
     return { key, url };
   }
 
-  const client = getS3Client();
+  // const client = getS3Client();
 
-  const { getSignedUrl: getS3SignedUrl } = await import('@aws-sdk/s3-request-presigner');
+  // const { getSignedUrl: getS3SignedUrl } = await import('@aws-sdk/s3-request-presigner');
 
-  const getObjectCommand = new GetObjectCommand({
-    Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
-    Key: key,
-  });
+  // const getObjectCommand = new GetObjectCommand({
+  //   Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
+  //   Key: key,
+  // });
 
-  const url = await getS3SignedUrl(client, getObjectCommand, {
-    expiresIn: ONE_HOUR / ONE_SECOND,
-  });
+  // const url = await getS3SignedUrl(client, getObjectCommand, {
+  //   expiresIn: ONE_HOUR / ONE_SECOND,
+  // });
 
-  return { key, url };
+  // return { key, url };
+  return { key, url: `https://cdn.madverse.it/${key}` };
 };
 
 export const deleteS3File = async (key: string) => {
