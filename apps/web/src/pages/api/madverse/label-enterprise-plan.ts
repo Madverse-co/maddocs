@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       {
         name: 'Rohan Nesho Jain',
-        email: 'support@madverse.it',
+        email: 'suvan.mathur@madverse.co',
         role: 'SIGNER' as const,
         signingOrder: 2,
       },
