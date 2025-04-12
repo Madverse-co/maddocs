@@ -159,7 +159,7 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
       year: 'numeric',
     });
     htmlContent = htmlContent.replace('[Today Date]', todayDate);
-    htmlContent = htmlContent.replace('[Rohan Date]', '');
+    htmlContent = htmlContent.replace('[Suvan Date]', '');
     htmlContent = htmlContent.replace('For the Label', `For ${labelName}`);
 
     // Replace the placeholder content
