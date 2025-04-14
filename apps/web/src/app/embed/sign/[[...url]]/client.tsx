@@ -32,7 +32,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
 import { RecipientProvider } from '~/app/(signing)/sign/[token]/recipient-context';
-import { RejectDocumentDialog } from '~/app/(signing)/sign/[token]/reject-document-dialog';
 import { Logo } from '~/components/branding/logo';
 
 import { EmbedClientLoading } from '../../client-loading';
@@ -266,7 +265,7 @@ export const EmbedSignDocumentClientPage = ({
       <div className="embed--Root relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
         {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
 
-        {allowDocumentRejection && (
+        {/* {allowDocumentRejection && (
           <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
             <RejectDocumentDialog
               document={{ id: documentId }}
@@ -274,7 +273,7 @@ export const EmbedSignDocumentClientPage = ({
               onRejected={onDocumentRejected}
             />
           </div>
-        )}
+        )} */}
 
         <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
           {/* Viewer */}
