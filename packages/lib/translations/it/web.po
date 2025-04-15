@@ -47,7 +47,7 @@ msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"exa
 msgstr "\"{placeholderEmail}\" per conto di \"{0}\" ti ha invitato a firmare \"documento di esempio\"."
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:271
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:390
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:389
 msgid "(You)"
 msgstr ""
 
@@ -146,10 +146,6 @@ msgstr "{inviterName} ha annullato il documento {documentName}, non è più nece
 msgid "{inviterName} has cancelled the document<0/>\"{documentName}\""
 msgstr "{inviterName} ha annullato il documento<0/>\"{documentName}\""
 
-#: packages/email/template-components/template-document-invite.tsx:74
-msgid "{inviterName} has invited you to {0}<0/>\"{documentName}\""
-msgstr "{inviterName} ti ha invitato a {0}<0/>\"{documentName}\""
-
 #: packages/email/templates/document-invite.tsx:41
 msgid "{inviterName} has invited you to {action} {documentName}"
 msgstr "{inviterName} ti ha invitato a {action} {documentName}"
@@ -165,10 +161,6 @@ msgstr "{inviterName} ti ha rimosso dal documento {documentName}."
 #: packages/email/templates/recipient-removed-from-document.tsx:49
 msgid "{inviterName} has removed you from the document<0/>\"{documentName}\""
 msgstr "{inviterName} ti ha rimosso dal documento<0/>\"{documentName}\""
-
-#: packages/email/template-components/template-document-invite.tsx:61
-msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {0}<0/>\"{documentName}\""
-msgstr "{inviterName} per conto di \"{teamName}\" ti ha invitato a {0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:45
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
@@ -314,10 +306,6 @@ msgstr "{remaningLength, plural, one {# carattere rimanente} other {# caratteri 
 #: packages/email/template-components/template-document-rejected.tsx:25
 msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "{signerName} ha rifiutato il documento \"{documentName}\"."
-
-#: packages/email/template-components/template-document-invite.tsx:68
-msgid "{teamName} has invited you to {0}<0/>\"{documentName}\""
-msgstr "{teamName} ti ha invitato a {0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:46
 msgid "{teamName} has invited you to {action} {documentName}"
@@ -1102,7 +1090,7 @@ msgid "Approve"
 msgstr "Approvare"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:183
-#: packages/email/template-components/template-document-invite.tsx:108
+#: packages/email/template-components/template-document-invite.tsx:52
 msgid "Approve Document"
 msgstr "Approva Documento"
 
@@ -1158,11 +1146,11 @@ msgid "Assist"
 msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:184
-#: packages/email/template-components/template-document-invite.tsx:110
+#: packages/email/template-components/template-document-invite.tsx:54
 msgid "Assist Document"
 msgstr ""
 
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:300
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:299
 msgid "Assist with signing"
 msgstr ""
 
@@ -1364,7 +1352,6 @@ msgstr ""
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:234
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:347
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:158
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:131
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:318
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:358
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
@@ -1503,7 +1490,7 @@ msgstr "Clicca per copiare il link di firma da inviare al destinatario"
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:180
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:174
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:496
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:504
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:503
 msgid "Click to insert field"
 msgstr "Clicca per inserire il campo"
 
@@ -1524,8 +1511,8 @@ msgstr "Chiudi"
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:61
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:388
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:486
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:333
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:494
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:332
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:493
 #: apps/web/src/components/forms/v2/signup.tsx:538
 msgid "Complete"
 msgstr "Completa"
@@ -1649,25 +1636,9 @@ msgstr "Contenuto"
 msgid "Continue"
 msgstr "Continua"
 
-#: packages/email/template-components/template-document-invite.tsx:85
-msgid "Continue by approving the document."
-msgstr "Continua approvando il documento."
-
-#: packages/email/template-components/template-document-invite.tsx:88
-msgid "Continue by assisting with the document."
-msgstr ""
-
 #: packages/email/template-components/template-document-completed.tsx:45
 msgid "Continue by downloading the document."
 msgstr "Continua scaricando il documento."
-
-#: packages/email/template-components/template-document-invite.tsx:83
-msgid "Continue by signing the document."
-msgstr "Continua firmando il documento."
-
-#: packages/email/template-components/template-document-invite.tsx:84
-msgid "Continue by viewing the document."
-msgstr "Continua visualizzando il documento."
 
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:141
 msgid "Continue to login"
@@ -1706,7 +1677,7 @@ msgstr "Copiato"
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:61
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:117
 #: apps/web/src/components/forms/public-profile-form.tsx:117
-#: packages/ui/components/document/document-share-button.tsx:46
+#: packages/ui/components/document/document-share-button.tsx:45
 #: packages/ui/primitives/document-flow/add-subject.tsx:241
 msgid "Copied to clipboard"
 msgstr "Copiato negli appunti"
@@ -1716,7 +1687,7 @@ msgstr "Copiato negli appunti"
 msgid "Copy"
 msgstr "Copia"
 
-#: packages/ui/components/document/document-share-button.tsx:194
+#: packages/ui/components/document/document-share-button.tsx:193
 msgid "Copy Link"
 msgstr "Copia il link"
 
@@ -2484,7 +2455,7 @@ msgstr "Divulgazione della firma elettronica"
 #: apps/web/src/app/(recipient)/d/[token]/configure-direct-template.tsx:119
 #: apps/web/src/app/(signing)/sign/[token]/email-field.tsx:133
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:422
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:427
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:426
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:169
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:153
 #: apps/web/src/components/forms/forgot-password.tsx:81
@@ -2822,7 +2793,7 @@ msgstr "Firma gratuita"
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:326
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:212
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:407
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:412
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:411
 #: apps/web/src/components/forms/profile.tsx:101
 #: apps/web/src/components/forms/v2/signup.tsx:316
 msgid "Full Name"
@@ -2877,19 +2848,19 @@ msgstr "Vai alle tue <0>impostazioni del profilo pubblico</0> per aggiungere doc
 msgid "Green"
 msgstr "Verde"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:120
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:119
 msgid "has invited you to approve this document"
 msgstr "ti ha invitato ad approvare questo documento"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:129
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:128
 msgid "has invited you to assist this document"
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:111
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:110
 msgid "has invited you to sign this document"
 msgstr "ti ha invitato a firmare questo documento"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:102
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:101
 msgid "has invited you to view this document"
 msgstr "ti ha invitato a visualizzare questo documento"
 
@@ -2902,7 +2873,7 @@ msgstr "ti ha invitato a visualizzare questo documento"
 msgid "Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist."
 msgstr ""
 
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:342
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:341
 msgid "Help complete the document for other signers."
 msgstr ""
 
@@ -3478,7 +3449,7 @@ msgid "New Template"
 msgstr "Nuovo modello"
 
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:477
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:483
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:482
 #: apps/web/src/components/forms/v2/signup.tsx:525
 msgid "Next"
 msgstr "Successivo"
@@ -3595,19 +3566,19 @@ msgstr "Numero"
 msgid "Number format"
 msgstr "Formato numero"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:116
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:115
 msgid "on behalf of \"{0}\" has invited you to approve this document"
 msgstr "per conto di \"{0}\" ti ha invitato ad approvare questo documento"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:125
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:124
 msgid "on behalf of \"{0}\" has invited you to assist this document"
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:107
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:106
 msgid "on behalf of \"{0}\" has invited you to sign this document"
 msgstr "per conto di \"{0}\" ti ha invitato a firmare questo documento"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:98
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:97
 msgid "on behalf of \"{0}\" has invited you to view this document"
 msgstr "per conto di \"{0}\" ti ha invitato a visualizzare questo documento"
 
@@ -3852,10 +3823,6 @@ msgstr "Scegli uno dei seguenti accordi e inizia a firmare per iniziare"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:67
 msgid "Placeholder"
 msgstr "Segnaposto"
-
-#: packages/email/template-components/template-document-invite.tsx:55
-msgid "Please {0} your document<0/>\"{documentName}\""
-msgstr "Per favore {0} il tuo documento<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:50
 msgid "Please {action} your document {documentName}"
@@ -4191,7 +4158,6 @@ msgstr "Registrazione avvenuta con successo"
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:114
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:121
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:167
-#: packages/email/template-components/template-document-invite.tsx:98
 msgid "Reject Document"
 msgstr "Rifiuta Documento"
 
@@ -4319,7 +4285,7 @@ msgstr "Risolvi"
 msgid "Resolve payment"
 msgstr "Risolvere il pagamento"
 
-#: packages/ui/components/document/document-share-button.tsx:147
+#: packages/ui/components/document/document-share-button.tsx:146
 msgid "Rest assured, your document is strictly confidential and will never be shared. Only your signing experience will be highlighted. Share your personalized signing card to showcase your signature!"
 msgstr "Stai tranquillo, il tuo documento è strettamente confidenziale e non sarà mai condiviso. Solo la tua esperienza di firma sarà evidenziata. Condividi la tua carta di firma personalizzata per mostrare la tua firma!"
 
@@ -4572,10 +4538,6 @@ msgstr "Configurazione"
 msgid "Share"
 msgstr "Condividi"
 
-#: packages/ui/components/document/document-share-button.tsx:135
-msgid "Share Signature Card"
-msgstr "Condividi carta firma"
-
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:185
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:213
 msgid "Share Signing Card"
@@ -4585,7 +4547,7 @@ msgstr "Condividi scheda di firma"
 msgid "Share the Link"
 msgstr "Condividi il link"
 
-#: packages/ui/components/document/document-share-button.tsx:143
+#: packages/ui/components/document/document-share-button.tsx:142
 msgid "Share your signing experience!"
 msgstr "Condividi la tua esperienza di firma!"
 
@@ -4634,12 +4596,12 @@ msgid "Sign as<0>{0} <1>({1})</1></0>"
 msgstr "Firma come<0>{0} <1>({1})</1></0>"
 
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:360
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:302
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:301
 msgid "Sign document"
 msgstr "Firma il documento"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:182
-#: packages/email/template-components/template-document-invite.tsx:106
+#: packages/email/template-components/template-document-invite.tsx:50
 msgid "Sign Document"
 msgstr "Firma documento"
 
@@ -4669,7 +4631,7 @@ msgid "Sign Out"
 msgstr "Disconnetti"
 
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:396
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:344
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:343
 msgid "Sign the document to complete the process."
 msgstr "Firma il documento per completare il processo."
 
@@ -4698,7 +4660,7 @@ msgstr "Iscriviti con OIDC"
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:249
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:284
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:437
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:441
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:440
 #: apps/web/src/components/forms/profile.tsx:123
 #: packages/ui/primitives/document-flow/add-fields.tsx:847
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
@@ -4714,7 +4676,7 @@ msgstr "ID Firma"
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:364
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:301
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:463
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:467
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:466
 msgid "Signature is too small. Please provide a more complete signature."
 msgstr "La firma è troppo piccola. Si prega di fornire una firma più completa."
 
@@ -4766,7 +4728,7 @@ msgstr "Certificato di firma fornito da"
 msgid "Signing Complete!"
 msgstr "Firma completata!"
 
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:357
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:356
 msgid "Signing for"
 msgstr ""
 
@@ -4849,7 +4811,7 @@ msgstr "Alcuni firmatari non hanno un campo firma assegnato. Assegna almeno 1 ca
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:39
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:61
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:262
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:168
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:167
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:50
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:99
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:210
@@ -4859,7 +4821,7 @@ msgstr "Alcuni firmatari non hanno un campo firma assegnato. Assegna almeno 1 ca
 #: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:65
 #: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:82
 #: apps/web/src/components/(teams)/team-billing-portal-button.tsx:29
-#: packages/ui/components/document/document-share-button.tsx:51
+#: packages/ui/components/document/document-share-button.tsx:50
 msgid "Something went wrong"
 msgstr "Qualcosa è andato storto"
 
@@ -5382,11 +5344,11 @@ msgstr "Il destinatario è tenuto a visualizzare il documento affinché sia comp
 msgid "The selected team member will receive an email which they must accept before the team is transferred"
 msgstr "Il membro del team selezionato riceverà un'email che dovrà accettare prima che il team venga trasferito"
 
-#: packages/ui/components/document/document-share-button.tsx:52
+#: packages/ui/components/document/document-share-button.tsx:51
 msgid "The sharing link could not be created at this time. Please try again."
 msgstr "Il link di condivisione non può essere creato in questo momento. Per favore riprova."
 
-#: packages/ui/components/document/document-share-button.tsx:47
+#: packages/ui/components/document/document-share-button.tsx:46
 msgid "The sharing link has been copied to your clipboard."
 msgstr "Il link di condivisione è stato copiato negli appunti."
 
@@ -5541,10 +5503,6 @@ msgstr "Questo documento è stato creato da te o un membro del team utilizzando 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:160
 msgid "This document was created using a direct link."
 msgstr "Questo documento è stato creato utilizzando un link diretto."
-
-#: packages/email/template-components/template-footer.tsx:17
-msgid "This document was sent using <0>Maddocs.</0>"
-msgstr "Questo documento è stato inviato utilizzando <0>Maddocs.</0>"
 
 #: packages/email/template-components/template-document-rejection-confirmed.tsx:26
 msgid "This email confirms that you have rejected the document <0>\"{documentName}\"</0> sent by {documentOwnerName}."
@@ -6232,7 +6190,7 @@ msgid "View document"
 msgstr "Visualizza documento"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:181
-#: packages/email/template-components/template-document-invite.tsx:107
+#: packages/email/template-components/template-document-invite.tsx:51
 #: packages/email/template-components/template-document-rejected.tsx:44
 #: packages/ui/primitives/document-flow/add-subject.tsx:90
 #: packages/ui/primitives/document-flow/add-subject.tsx:91
@@ -6505,7 +6463,7 @@ msgstr "Non siamo riusciti a impostare l'autenticazione a due fattori per il tuo
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:120
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:264
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:170
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:169
 msgid "We were unable to submit this document at this time. Please try again later."
 msgstr "Non siamo riusciti a inviare questo documento in questo momento. Per favore riprova più tardi."
 
