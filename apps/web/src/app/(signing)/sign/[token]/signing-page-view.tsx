@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 
-import { Trans } from '@lingui/macro';
 import { match } from 'ts-pattern';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -85,9 +84,9 @@ export const SigningPageView = ({
           {document.title}
         </h1>
 
-        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-6">
+        {/* <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-6">
           <div className="max-w-[50ch]">
-            <span className="text-muted-foreground truncate" title={senderName}>
+             <span className="text-muted-foreground truncate" title={senderName}>
               {senderName} {senderEmail}
             </span>{' '}
             <span className="text-muted-foreground">
@@ -130,10 +129,10 @@ export const SigningPageView = ({
                 )
                 .otherwise(() => null)}
             </span>
-          </div>
+          </div> 
 
-          {/* <RejectDocumentDialog document={document} token={recipient.token} /> */}
-        </div>
+           <RejectDocumentDialog document={document} token={recipient.token} /> 
+        </div> */}
 
         <div className="mt-8 grid grid-cols-12 gap-y-8 lg:gap-x-8 lg:gap-y-0">
           <Card
