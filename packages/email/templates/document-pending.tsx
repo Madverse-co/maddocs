@@ -6,6 +6,7 @@ import { useBranding } from '../providers/branding';
 import type { TemplateDocumentPendingProps } from '../template-components/template-document-pending';
 import { TemplateDocumentPending } from '../template-components/template-document-pending';
 import { TemplateFooter } from '../template-components/template-footer';
+import { TemplateHeader } from '../template-components/template-header';
 
 export type DocumentPendingEmailTemplateProps = Partial<TemplateDocumentPendingProps>;
 
@@ -29,14 +30,10 @@ export const DocumentPendingEmailTemplate = ({
 
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-white">
+          <Container className="mx-auto mb-2 max-w-xl">
+            <TemplateHeader assetBaseUrl={assetBaseUrl} />
+          </Container>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
-            <Container className="mx-auto mb-2 max-w-xl">
-              <Img
-                src={getAssetUrl('/static/mad-banner.png')}
-                alt="Madverse Agreements"
-                width="100%"
-              />
-            </Container>
             <Section>
               {branding.brandingEnabled && branding.brandingLogo ? (
                 <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />

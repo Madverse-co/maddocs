@@ -6,6 +6,7 @@ import { useBranding } from '../providers/branding';
 import type { TemplateDocumentSelfSignedProps } from '../template-components/template-document-self-signed';
 import { TemplateDocumentSelfSigned } from '../template-components/template-document-self-signed';
 import { TemplateFooter } from '../template-components/template-footer';
+import { TemplateHeader } from '../template-components/template-header';
 
 export type DocumentSelfSignedTemplateProps = TemplateDocumentSelfSignedProps;
 
@@ -30,11 +31,7 @@ export const DocumentSelfSignedEmailTemplate = ({
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-white">
           <Container className="mx-auto mb-2 max-w-xl">
-            <Img
-              src={getAssetUrl('/static/mad-banner.png')}
-              alt="Madverse Agreements"
-              width="100%"
-            />
+            <TemplateHeader assetBaseUrl={assetBaseUrl} />
           </Container>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
             <Section className="p-2">

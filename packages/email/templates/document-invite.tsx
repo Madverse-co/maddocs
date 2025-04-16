@@ -9,6 +9,7 @@ import { useBranding } from '../providers/branding';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
 import { TemplateDocumentInvite } from '../template-components/template-document-invite';
 import { TemplateFooter } from '../template-components/template-footer';
+import { TemplateHeader } from '../template-components/template-header';
 
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
   customBody?: string;
@@ -61,14 +62,10 @@ export const DocumentInviteEmailTemplate = ({
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>
+          <Container className="mx-auto mb-2 max-w-xl">
+            <TemplateHeader assetBaseUrl={assetBaseUrl} />
+          </Container>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
-            <Container className="mx-auto mb-2 max-w-xl">
-              <Img
-                src={getAssetUrl('/static/mad-banner.png')}
-                alt="Madverse Agreements"
-                width="100%"
-              />
-            </Container>
             <Section>
               <Img
                 src={'https://app.madverse.co/assets/madverse_logo_mini.svg'}

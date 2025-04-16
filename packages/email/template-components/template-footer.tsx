@@ -14,13 +14,15 @@ export const TemplateFooter = ({
   };
 
   return (
-    <Section className="bg-black px-12 py-8 text-white">
+    <Section className="rounded-lg bg-black px-12 py-8 text-white">
       <Row className="items-center justify-between">
-        <Column className="w-1/4">
-          <Img src={getAssetUrl('/static/madverse-logo.png')} alt="MADVERSE" width="140" />
-        </Column>
-
-        <Column className="w-2/4 text-center">
+        <Column className="w-1/2">
+          <Img
+            className="w-2/3"
+            src={getAssetUrl('/static/madverse-logo.png')}
+            alt="MADVERSE"
+            width="140"
+          />
           <Text className="m-0 text-sm font-light text-white">
             Tower A, Golf View Corporate Towers,
           </Text>
@@ -29,7 +31,7 @@ export const TemplateFooter = ({
           </Text>
         </Column>
 
-        <Column className="w-1/4 text-right">
+        <Column className="w-1/2 text-right">
           <Row className="justify-end">
             <Column className="w-auto px-2">
               <Link href="https://www.instagram.com/madverse.music/" aria-label="Instagram">
