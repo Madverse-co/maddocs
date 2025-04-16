@@ -13,7 +13,7 @@ export type DocumentDeleteEmailTemplateProps = Partial<TemplateDocumentDeletePro
 
 export const DocumentSuperDeleteEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
   reason = 'Unknown',
 }: DocumentDeleteEmailTemplateProps) => {
   const { _ } = useLingui();

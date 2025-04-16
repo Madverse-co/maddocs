@@ -29,7 +29,7 @@ export type TeamInviteEmailProps = {
 };
 
 export const TeamInviteEmailTemplate = ({
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
   baseUrl = 'https://documenso.com',
   senderName = 'John Doe',
   teamName = 'Team Name',

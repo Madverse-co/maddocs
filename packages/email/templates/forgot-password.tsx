@@ -11,7 +11,7 @@ export type ForgotPasswordTemplateProps = Partial<TemplateForgotPasswordProps>;
 
 export const ForgotPasswordTemplate = ({
   resetPasswordLink = 'https://documenso.com',
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
 }: ForgotPasswordTemplateProps) => {
   const { _ } = useLingui();
   const branding = useBranding();

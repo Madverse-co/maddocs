@@ -16,7 +16,7 @@ export type TeamDeleteEmailProps = {
 };
 
 export const TeamDeleteEmailTemplate = ({
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
   baseUrl = 'https://documenso.com',
   teamUrl = 'demo',
   isOwner = false,

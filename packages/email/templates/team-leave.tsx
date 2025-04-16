@@ -18,7 +18,7 @@ export type TeamLeaveEmailProps = {
 };
 
 export const TeamLeaveEmailTemplate = ({
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
   baseUrl = 'https://documenso.com',
   memberName = 'John Doe',
   memberEmail = 'johndoe@documenso.com',

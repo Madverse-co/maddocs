@@ -9,7 +9,7 @@ import { TemplateFooter } from '../template-components/template-footer';
 
 export const ConfirmEmailTemplate = ({
   confirmationLink,
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
 }: TemplateConfirmationEmailProps) => {
   const { _ } = useLingui();
   const branding = useBranding();

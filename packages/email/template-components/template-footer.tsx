@@ -7,7 +7,7 @@ export type TemplateFooterProps = {
 
 export const TemplateFooter = ({
   isDocument = true,
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
 }: TemplateFooterProps) => {
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

@@ -12,7 +12,7 @@ export type DocumentPendingEmailTemplateProps = Partial<TemplateDocumentPendingP
 
 export const DocumentPendingEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
 }: DocumentPendingEmailTemplateProps) => {
   const { _ } = useLingui();
   const branding = useBranding();

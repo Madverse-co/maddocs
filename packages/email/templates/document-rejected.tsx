@@ -21,7 +21,7 @@ export function DocumentRejectedEmail({
   documentName,
   documentUrl,
   rejectionReason,
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
   recipientEmail,
 }: DocumentRejectedEmailProps) {
   const { _ } = useLingui();

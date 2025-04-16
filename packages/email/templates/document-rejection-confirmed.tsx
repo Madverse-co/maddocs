@@ -19,7 +19,7 @@ export function DocumentRejectionConfirmedEmail({
   documentName,
   documentOwnerName,
   reason,
-  assetBaseUrl = 'http://localhost:3002',
+  assetBaseUrl = 'https://agreements.madverse.co',
 }: DocumentRejectionConfirmedEmailProps) {
   const { _ } = useLingui();
   const branding = useBranding();
