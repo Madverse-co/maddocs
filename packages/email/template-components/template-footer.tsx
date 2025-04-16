@@ -16,7 +16,7 @@ export const TemplateFooter = ({
   return (
     <Section className="rounded-lg bg-black px-12 py-8 text-white">
       <Row className="items-center justify-between">
-        <Column className="w-1/2">
+        <Column className="w-1/2 align-middle">
           <Img
             className="w-2/3"
             src={getAssetUrl('/static/madverse-logo.png')}
@@ -32,7 +32,7 @@ export const TemplateFooter = ({
         </Column>
 
         <Column className="w-1/2 text-right">
-          <Row className="justify-end">
+          <Row className="justify-end align-bottom">
             <Column className="w-auto px-2">
               <Link href="https://www.instagram.com/madverse.music/" aria-label="Instagram">
                 <Img
