@@ -60,7 +60,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
   const completedDocument = await getFile(document.documentData);
   const pdfS3Key = document.documentData.data;
 
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'https://agreements.madverse.co';
 
   let documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(
     document.team?.url,
