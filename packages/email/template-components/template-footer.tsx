@@ -17,16 +17,11 @@ export const TemplateFooter = ({
     <Section className="rounded-lg bg-black px-12 py-8 text-white">
       <Row className="items-center justify-between">
         <Column className="w-1/2 align-middle">
-          <Img
-            className="w-2/3"
-            src={getAssetUrl('/static/madverse-logo.png')}
-            alt="MADVERSE"
-            width="140"
-          />
-          <Text className="m-0 text-sm font-light text-white">
+          <Img className="w-2/3" src={getAssetUrl('/static/madverse-logo.png')} alt="MADVERSE" />
+          <Text className="m-0 text-xs font-light text-white">
             Tower A, Golf View Corporate Towers,
           </Text>
-          <Text className="m-0 text-sm font-light text-white">
+          <Text className="m-0 text-xs font-light text-white">
             Golf Course Road, Gurgaon, Haryana, India, 122002
           </Text>
         </Column>
