@@ -31,7 +31,7 @@ export const TemplateFooter = ({
             <Column className="w-auto px-2">
               <Link href="https://www.instagram.com/madverse.music/" aria-label="Instagram">
                 <Img
-                  src={getAssetUrl('/static/instagram-icon.svg')}
+                  src={getAssetUrl('/static/instagram-icon.png')}
                   alt="Instagram"
                   width="24"
                   height="24"
@@ -42,7 +42,7 @@ export const TemplateFooter = ({
             <Column className="w-auto px-2">
               <Link href="https://www.facebook.com/people/MADverse-Music" aria-label="Facebook">
                 <Img
-                  src={getAssetUrl('/static/facebook-icon.svg')}
+                  src={getAssetUrl('/static/facebook-icon.png')}
                   alt="Facebook"
                   width="24"
                   height="24"
@@ -53,7 +53,7 @@ export const TemplateFooter = ({
             <Column className="w-auto px-2">
               <Link href="https://in.linkedin.com/company/madverse-music" aria-label="LinkedIn">
                 <Img
-                  src={getAssetUrl('/static/linkedin-icon.svg')}
+                  src={getAssetUrl('/static/linkedin-icon.png')}
                   alt="LinkedIn"
                   width="24"
                   height="24"
