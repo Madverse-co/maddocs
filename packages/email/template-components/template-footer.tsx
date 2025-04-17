@@ -27,7 +27,7 @@ export const TemplateFooter = ({
         </Column>
 
         <Column className="w-1/2 text-right">
-          <Row className="justify-end align-bottom">
+          <Row className="items-end justify-end align-bottom">
             <Column className="w-auto px-2">
               <Link href="https://www.instagram.com/madverse.music/" aria-label="Instagram">
                 <Img
