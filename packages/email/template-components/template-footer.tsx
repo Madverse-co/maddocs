@@ -14,7 +14,7 @@ export const TemplateFooter = ({
   };
 
   return (
-    <Section className="rounded-lg bg-neutral-950 p-8 text-white">
+    <Section style={{ backgroundColor: 'black' }} className="rounded-lg p-8 text-white">
       <Row className="w-full items-center justify-between">
         <Column className="w-1/2">
           <Img
@@ -24,7 +24,7 @@ export const TemplateFooter = ({
           />
         </Column>
 
-        <Column className="flex w-1/2 justify-end gap-4">
+        <Column style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
           <Link href="https://www.instagram.com/madverse.music/" aria-label="Instagram">
             <Img
               src={getAssetUrl('/static/instagram-icon.png')}
