@@ -1,7 +1,7 @@
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { Body, Container, Head, Html, Preview, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateFooter } from '../template-components/template-footer';
 import type { TemplateForgotPasswordProps } from '../template-components/template-forgot-password';
@@ -31,16 +31,6 @@ export const ForgotPasswordTemplate = ({
         <Section>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
             <Section>
-              {branding.brandingEnabled && branding.brandingLogo ? (
-                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
-              ) : (
-                <Img
-                  src={getAssetUrl('/static/logo.svg')}
-                  alt="Maddocs Logo"
-                  className="mb-4 h-6"
-                />
-              )}
-
               <TemplateForgotPassword
                 resetPasswordLink={resetPasswordLink}
                 assetBaseUrl={assetBaseUrl}

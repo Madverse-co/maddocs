@@ -18,7 +18,12 @@ export const TemplateDocumentPending = ({
 
   return (
     <>
-      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
+      <TemplateDocumentImage
+        className="mt-6"
+        documentName={documentName}
+        text={`${documentName} has been signed. Waiting for others to sign ${documentName}. We'll notify you as soon as it's ready.`}
+        assetBaseUrl={assetBaseUrl}
+      />
 
       <Section>
         <Section className="mb-4">
@@ -32,18 +37,6 @@ export const TemplateDocumentPending = ({
             </Text>
           </Column>
         </Section>
-
-        <Text className="text-primary mb-0 text-center text-lg font-semibold">
-          <Trans>“{documentName}” has been signed</Trans>
-        </Text>
-
-        <Text className="mx-auto mb-6 mt-1 max-w-[80%] text-center text-base text-slate-400">
-          <Trans>
-            We're still waiting for other signers to sign this document.
-            <br />
-            We'll notify you as soon as it's ready.
-          </Trans>
-        </Text>
       </Section>
     </>
   );

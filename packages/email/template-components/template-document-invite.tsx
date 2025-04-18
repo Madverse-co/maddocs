@@ -2,7 +2,6 @@ import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { match } from 'ts-pattern';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { RecipientRole } from '@documenso/prisma/client';
 
 import { Button, Section } from '../components';
@@ -19,6 +18,7 @@ export interface TemplateDocumentInviteProps {
   isTeamInvite: boolean;
   teamName?: string;
   includeSenderDetails?: boolean;
+  action: string;
 }
 
 export const TemplateDocumentInvite = ({
@@ -31,14 +31,21 @@ export const TemplateDocumentInvite = ({
   isTeamInvite,
   teamName,
   includeSenderDetails,
+  action,
 }: TemplateDocumentInviteProps) => {
   const { _ } = useLingui();
 
-  const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
+  // const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
 
   return (
     <>
-      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
+      <TemplateDocumentImage
+        className="mt-6"
+        assetBaseUrl={assetBaseUrl}
+        documentName={documentName}
+        inviterName={inviterName}
+        action={action}
+      />
 
       <Section>
         <Section className="mb-6 mt-8 text-center">

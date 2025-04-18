@@ -4,7 +4,7 @@ import { useLingui } from '@lingui/react';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { RecipientRole } from '@documenso/prisma/client';
 
-import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
 import { TemplateDocumentInvite } from '../template-components/template-document-invite';
@@ -67,12 +67,6 @@ export const DocumentInviteEmailTemplate = ({
           </Container>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
             <Section>
-              <Img
-                src={'https://app.madverse.co/assets/madverse_logo_mini.svg'}
-                alt="Maddocs Logo"
-                className="mb-4 h-6"
-              />
-
               <TemplateDocumentInvite
                 inviterName={inviterName}
                 inviterEmail={inviterEmail}
@@ -84,6 +78,7 @@ export const DocumentInviteEmailTemplate = ({
                 isTeamInvite={isTeamInvite}
                 teamName={teamName}
                 includeSenderDetails={includeSenderDetails}
+                action={action}
               />
             </Section>
           </Container>
