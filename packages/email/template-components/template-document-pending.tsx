@@ -18,12 +18,7 @@ export const TemplateDocumentPending = ({
 
   return (
     <>
-      <TemplateDocumentImage
-        className="mt-6"
-        documentName={documentName}
-        text={`${documentName} has been signed. Waiting for others to sign ${documentName}. We'll notify you as soon as it's ready.`}
-        assetBaseUrl={assetBaseUrl}
-      />
+      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
         <Section className="mb-4">
