@@ -4,7 +4,7 @@ import { match } from 'ts-pattern';
 
 import { RecipientRole } from '@documenso/prisma/client';
 
-import { Button, Section } from '../components';
+import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentInviteProps {
@@ -39,18 +39,17 @@ export const TemplateDocumentInvite = ({
 
   return (
     <>
-      <TemplateDocumentImage
-        className="mt-6"
-        assetBaseUrl={assetBaseUrl}
-        documentName={documentName}
-        inviterName={inviterName}
-        action={action}
-      />
+      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
+
+      <Text className="mt-4 text-center text-sm text-black">
+        {`${inviterName} has invited you to ${action}`} <br />
+        {`"${documentName}"`}
+      </Text>
 
       <Section>
         <Section className="mb-6 mt-8 text-center">
           <Button
-            className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+            className="inline-flex items-center justify-center rounded-lg bg-[#84EB0C] px-6 py-3 text-center text-sm font-bold text-black no-underline"
             href={signDocumentLink}
           >
             {match(role)

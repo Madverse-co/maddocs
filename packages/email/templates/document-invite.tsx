@@ -1,10 +1,10 @@
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { RecipientRole } from '@documenso/prisma/client';
 
-import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Preview, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
 import { TemplateDocumentInvite } from '../template-components/template-document-invite';
@@ -51,9 +51,9 @@ export const DocumentInviteEmailTemplate = ({
     previewText = msg`Please ${action} your document ${documentName}`;
   }
 
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
+  // const getAssetUrl = (path: string) => {
+  //   return new URL(path, assetBaseUrl).toString();
+  // };
 
   return (
     <Html>
@@ -83,7 +83,7 @@ export const DocumentInviteEmailTemplate = ({
             </Section>
           </Container>
 
-          <Container className="mx-auto mt-12 max-w-xl">
+          {/* <Container className="mx-auto mt-12 max-w-xl">
             <Section>
               {!isTeamInvite && (
                 <Text className="my-4 text-base font-semibold">
@@ -106,7 +106,7 @@ export const DocumentInviteEmailTemplate = ({
                 )}
               </Text>
             </Section>
-          </Container>
+          </Container> */}
 
           <Hr className="mx-auto mt-12 max-w-xl" />
 
