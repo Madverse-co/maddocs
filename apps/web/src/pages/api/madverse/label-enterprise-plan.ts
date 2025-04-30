@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const doc = await client.createDocument({
       body: {
-        title: `Madverse Label Enterprise Plan Agreement`,
+        title: `${labelName} - Madverse Label Enterprise Plan Agreement`,
         recipients,
         meta: {
           subject: `Please sign the Madverse Label Enterprise Plan Agreement`,
