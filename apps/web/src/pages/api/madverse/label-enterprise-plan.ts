@@ -1,188 +1,135 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { initClient } from '@ts-rest/core';
-
-import { ApiContractV1 } from '@documenso/api/v1/contract';
-import { generatePdf } from '@documenso/lib/server-only/madverse';
-import { addEventToQueue } from '@documenso/lib/server-only/madverse';
+import { createLabelAgreementOptimized } from '@documenso/lib/server-only/madverse';
 
 export const config = {
   maxDuration: 60,
 };
 
-const getFieldTypeFromMarker = (marker: string) => {
-  switch (marker) {
-    case 'NAME':
-      return 'NAME';
-    case 'DATE':
-      return 'DATE';
-    case 'SIGNATURE':
-      return 'SIGNATURE';
-    default:
-      return 'SIGNATURE';
+// Input validation with detailed error messages
+
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+function validateRequest(body: unknown): ValidationResult {
+  const errors: string[] = [];
+
+  if (!body || typeof body !== 'object') {
+    return {
+      isValid: false,
+      errors: ['Request body is required and must be a valid JSON object'],
+    };
   }
-};
+
+  const data = body as Record<string, unknown>;
+  const required = [
+    { field: 'labelName', type: 'string' },
+    { field: 'labelAddress', type: 'string' },
+    { field: 'labelEmail', type: 'string' },
+    { field: 'royaltySplit', type: 'number' },
+    { field: 'usersName', type: 'string' },
+  ];
+
+  // Check required fields and types
+  for (const { field, type } of required) {
+    if (!data[field]) {
+      errors.push(`Missing required field: ${field}`);
+    } else if (typeof data[field] !== type) {
+      errors.push(`Field '${field}' must be of type ${type}, got ${typeof data[field]}`);
+    }
+  }
+
+  // Validate email format if email is provided
+  if (data.labelEmail && typeof data.labelEmail === 'string') {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.labelEmail)) {
+      errors.push('labelEmail must be a valid email address (example: user@domain.com)');
+    }
+  }
+
+  // Validate royalty split range if provided
+  if (data.royaltySplit && typeof data.royaltySplit === 'number') {
+    if (data.royaltySplit < 0 || data.royaltySplit > 100) {
+      errors.push('royaltySplit must be a number between 0 and 100');
+    }
+  }
+
+  // Validate string fields are not empty
+  const stringFields = ['labelName', 'labelAddress', 'usersName'];
+  for (const field of stringFields) {
+    if (data[field] && typeof data[field] === 'string' && (data[field] as string).trim() === '') {
+      errors.push(`Field '${field}' cannot be empty`);
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({
+      error: 'Method not allowed',
+      message: 'This endpoint only accepts POST requests',
+      allowedMethods: ['POST'],
+    });
+  }
+
+  // Validate input with detailed error messages
+  const validation = validateRequest(req.body);
+  if (!validation.isValid) {
+    return res.status(400).json({
+      error: 'Invalid request data',
+      message: 'Please check the following validation errors:',
+      validationErrors: validation.errors,
+      expectedFormat: {
+        labelName: 'string (required, non-empty)',
+        labelAddress: 'string (required, non-empty)',
+        labelEmail: 'string (required, valid email format)',
+        royaltySplit: 'number (required, 0-100)',
+        usersName: 'string (required, non-empty)',
+      },
+    });
   }
 
   try {
     const { labelName, labelAddress, labelEmail, royaltySplit, usersName } = req.body;
-    const pdfFile = await generatePdf({ labelName, labelAddress, royaltySplit });
 
-    if (!pdfFile.success || !pdfFile.file) {
-      return res.status(500).json({ error: 'Failed to generate PDF' });
-    }
-
-    const recipients = [
-      {
-        name: `${usersName} - ${labelName}`,
-        email: labelEmail,
-        role: 'SIGNER' as const,
-        signingOrder: 1,
-      },
-      {
-        name: 'Suvan Mathur',
-        email: 'suvan.mathur@madverse.co',
-        role: 'SIGNER' as const,
-        signingOrder: 2,
-      },
-    ];
-
-    const client = initClient(ApiContractV1, {
-      baseUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}`,
-      baseHeaders: {
-        authorization: `${process.env.ADMIN_ACCOUNT_API_KEY ?? ''}`,
-      },
-    });
-
-    const doc = await client.createDocument({
-      body: {
-        title: `${labelName} - Madverse Label Enterprise Plan Agreement`,
-        recipients,
-        meta: {
-          subject: `Please sign the Madverse Label Enterprise Plan Agreement`,
-          message: `Madverse has invited you ${labelName} to sign the Madverse Label Enterprise Plan Agreement`,
-          signingOrder: 'SEQUENTIAL',
-        },
-      },
-    });
-
-    if (doc.status !== 200) {
-      return res.status(500).json({ error: 'Failed to create document' });
-    }
-
-    const { uploadUrl, documentId, recipients: recipientData } = doc.body;
-
-    // Upload the PDF file
-    const formData = new FormData();
-    formData.append('file', pdfFile.file);
-
-    const uploadResponse = await fetch(uploadUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      body: formData,
-    });
-
-    if (!uploadResponse.ok) {
-      return res.status(500).json({ error: 'Failed to upload PDF' });
-    }
-
-    const userCoordinates = pdfFile.signatureBoxCoordinates;
-    const madverseCoordinates = pdfFile.madverseSignatureBoxCoordinates;
-
-    const coordinates = userCoordinates.map((coord) => ({
-      recipientId: Number(recipientData[0].recipientId),
-      type: getFieldTypeFromMarker(coord.marker),
-      pageNumber: coord.pageNumber || 1,
-      pageX: coord.x,
-      pageY: coord.y,
-      pageWidth: coord.width,
-      pageHeight: coord.height || 50,
-    }));
-
-    madverseCoordinates.forEach((coord) => {
-      coordinates.push({
-        recipientId: Number(recipientData[1].recipientId),
-        type: getFieldTypeFromMarker(coord.marker),
-        pageNumber: coord.pageNumber || 1,
-        pageX: coord.x,
-        pageY: coord.y,
-        pageWidth: coord.width,
-        pageHeight: coord.height || 50,
-      });
-    });
-
-    // Add signature fields to the document
-    const addFieldsResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/v1/documents/${documentId}/fields`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `${process.env.ADMIN_ACCOUNT_API_KEY ?? ''}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(coordinates),
-      },
-    );
-
-    if (!addFieldsResponse.ok) {
-      const errorData = await addFieldsResponse.json();
-      console.error('Failed to add fields:', {
-        status: addFieldsResponse.status,
-        statusText: addFieldsResponse.statusText,
-        error: errorData,
-      });
-      return res.status(500).json({ error: 'Failed to add signature fields', details: errorData });
-    }
-
-    const sendDocumentResponse = await client.sendDocument({
-      body: {
-        sendEmail: true,
-        sendCompletionEmails: true,
-      },
-      params: {
-        id: String(documentId),
-      },
-    });
-
-    if (sendDocumentResponse.status !== 200) {
-      return res.status(500).json({ error: 'Failed to send document via email' });
-    }
-
-    // Schedule reminder emails via QStash
-    const reminderUrl = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/madverse/resend-label-invite`;
-    const reminderData = {
-      documentId: String(documentId),
+    // Use optimized workflow that runs everything in parallel
+    const result = await createLabelAgreementOptimized({
       labelName,
+      labelAddress,
       labelEmail,
-    };
+      royaltySplit,
+      usersName,
+    });
 
-    // Schedule reminders for 2, 4, 6, 8, and 10 days from now
-    for (let day = 2; day <= 10; day += 2) {
-      const notBefore = Date.now() + day * 24 * 60 * 60 * 1000; // Convert days to milliseconds
-      const deduplicationId = `reminder-${documentId}-day-${day}`;
-
-      await addEventToQueue(
-        reminderUrl,
-        reminderData,
-        deduplicationId,
-        'document-reminders',
-        notBefore,
-      );
+    if (!result.success) {
+      return res.status(500).json({
+        error: result.error,
+        message:
+          'Document creation failed. Please try again or contact support if the issue persists.',
+      });
     }
 
     return res.status(200).json({
       success: true,
-      documentId,
-      signingUrl: recipientData[1].signingUrl,
+      documentId: result.documentId,
+      signingUrl: result.signingUrl,
+      message: 'Label enterprise agreement created successfully',
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Label agreement creation failed:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+      message: 'An unexpected error occurred during document creation. Please try again later.',
+      ...(process.env.NODE_ENV === 'development' && {
+        debug: error instanceof Error ? error.message : 'Unknown error',
+      }),
+    });
   }
 }

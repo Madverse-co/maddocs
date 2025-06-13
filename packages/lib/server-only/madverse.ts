@@ -1,6 +1,11 @@
+import { initClient } from '@ts-rest/core';
 import { Client } from '@upstash/qstash';
+import { Redis } from '@upstash/redis';
 // @ts-expect-error api2pdf doesn't have types and for some reason my types aren't recognised by ts.
 import Api2Pdf from 'api2pdf';
+import crypto from 'crypto';
+
+import { ApiContractV1 } from '@documenso/api/v1/contract';
 
 import { labelInvite } from './madverse-templates';
 
@@ -302,9 +307,14 @@ export const sendAgreementCompletedWebhook = async (
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Unknown error');
-      console.error(
-        `Event: AGREEMENT_COMPLETED - Failed to send webhook for recipient ${labelEmail}: HTTP ${response.status} - ${errorText}`,
-      );
+      if (response.status === 404)
+        console.warn(
+          `Event: AGREEMENT_COMPLETED - Webhook endpoint not found for recipient ${labelEmail}: HTTP 404 - ${errorText}`,
+        );
+      else
+        console.error(
+          `Event: AGREEMENT_COMPLETED - Failed to send webhook for recipient ${labelEmail}: HTTP ${response.status} - ${errorText}`,
+        );
     } else {
       console.log(
         `Event: AGREEMENT_COMPLETED - Successfully sent webhook to Madverse for recipient ${labelEmail}`,
@@ -338,9 +348,14 @@ export const sendLabelXArtistWebhook = async (documentId: number, recipientEmail
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Unknown error');
-      console.error(
-        `Event: LABEL_ARTIST_AGREEMENT_SIGNED - Failed to send webhook for recipient ${recipientEmail}: HTTP ${response.status} - ${errorText}`,
-      );
+      if (response.status === 404)
+        console.warn(
+          `Event: LABEL_ARTIST_AGREEMENT_SIGNED - Webhook endpoint not found for recipient ${recipientEmail}: HTTP 404 - probably not a label x artist agreement, can be safely ignored - ${errorText}`,
+        );
+      else
+        console.error(
+          `Event: LABEL_ARTIST_AGREEMENT_SIGNED - Failed to send webhook for recipient ${recipientEmail}: HTTP ${response.status} - ${errorText}`,
+        );
     } else {
       console.log(
         `Event: LABEL_ARTIST_AGREEMENT_SIGNED - Successfully sent webhook to Madverse for recipient ${recipientEmail}`,
@@ -350,3 +365,402 @@ export const sendLabelXArtistWebhook = async (documentId: number, recipientEmail
     console.error('Error in sending LabelXArtist webhook:', error);
   }
 };
+
+// SPEED OPTIMIZATION UTILITIES
+// ============================
+
+interface SignatureCoordinate {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  marker: string;
+  pageNumber: number;
+}
+
+interface RecipientData {
+  recipientId: string;
+  signingUrl: string;
+}
+
+interface FieldCoordinate {
+  recipientId: number;
+  type: string;
+  pageNumber: number;
+  pageX: number;
+  pageY: number;
+  pageWidth: number;
+  pageHeight: number;
+}
+
+interface CachedPdfData {
+  signatureBoxCoordinates: SignatureCoordinate[];
+  madverseSignatureBoxCoordinates: SignatureCoordinate[];
+  createdAt: number;
+}
+
+// Serverless-compatible PDF cache using Upstash Redis
+const CACHE_DURATION = 10 * 60; // 10 minutes in seconds for Redis TTL
+
+// Initialize Redis client (will be null if env vars not available)
+let redis: Redis | null = null;
+try {
+  redis = Redis.fromEnv();
+} catch (error) {
+  console.log('Upstash Redis not available, PDF caching disabled:', error);
+}
+
+// Singleton API client
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let cachedApiClient: any = null;
+
+function getCachedApiClient() {
+  if (!cachedApiClient) {
+    cachedApiClient = initClient(ApiContractV1, {
+      baseUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}`,
+      baseHeaders: {
+        authorization: `${process.env.ADMIN_ACCOUNT_API_KEY ?? ''}`,
+      },
+    });
+  }
+  return cachedApiClient;
+}
+
+function generateCacheKey(params: GeneratePdfParams): string {
+  return `pdf_cache_${crypto.createHash('sha256').update(JSON.stringify(params)).digest('hex')}`;
+}
+
+// Optimized PDF generation with Redis caching
+export async function generatePdfOptimized(params: GeneratePdfParams) {
+  const cacheKey = generateCacheKey(params);
+
+  if (redis) {
+    try {
+      // Try to get from Redis cache
+      const cached = await redis.get<CachedPdfData>(cacheKey);
+      if (cached) {
+        console.log('Using cached PDF for', params.labelName);
+        // Note: File object can't be serialized, so we'll need to regenerate but use cached coordinates
+        const pdfResult = await generatePdf(params);
+        if (pdfResult.success) {
+          return {
+            success: true,
+            file: pdfResult.file,
+            signatureBoxCoordinates: cached.signatureBoxCoordinates,
+            madverseSignatureBoxCoordinates: cached.madverseSignatureBoxCoordinates,
+          };
+        }
+      }
+    } catch (error) {
+      console.log('Redis cache miss or error, generating fresh PDF:', error);
+    }
+  }
+
+  const result = await generatePdf(params);
+
+  if (result.success && result.file && redis) {
+    try {
+      // Cache the coordinate data (not the file itself due to serialization)
+      const cacheData: CachedPdfData = {
+        signatureBoxCoordinates: result.signatureBoxCoordinates,
+        madverseSignatureBoxCoordinates: result.madverseSignatureBoxCoordinates,
+        createdAt: Date.now(),
+      };
+
+      await redis.set(cacheKey, cacheData, { ex: CACHE_DURATION });
+    } catch (error) {
+      console.log('Failed to cache PDF data:', error);
+    }
+  }
+
+  return result;
+}
+
+// Pre-process signature field coordinates
+export function prepareSignatureFields(
+  userCoordinates: SignatureCoordinate[],
+  madverseCoordinates: SignatureCoordinate[],
+  recipientData: RecipientData[],
+): FieldCoordinate[] {
+  const getFieldTypeFromMarker = (marker: string) => {
+    switch (marker) {
+      case 'NAME':
+        return 'NAME';
+      case 'DATE':
+        return 'DATE';
+      case 'SIGNATURE':
+        return 'SIGNATURE';
+      default:
+        return 'SIGNATURE';
+    }
+  };
+
+  const coordinates = userCoordinates.map((coord) => ({
+    recipientId: Number(recipientData[0].recipientId),
+    type: getFieldTypeFromMarker(coord.marker),
+    pageNumber: coord.pageNumber || 1,
+    pageX: coord.x,
+    pageY: coord.y,
+    pageWidth: coord.width,
+    pageHeight: coord.height || 50,
+  }));
+
+  madverseCoordinates.forEach((coord) => {
+    coordinates.push({
+      recipientId: Number(recipientData[1].recipientId),
+      type: getFieldTypeFromMarker(coord.marker),
+      pageNumber: coord.pageNumber || 1,
+      pageX: coord.x,
+      pageY: coord.y,
+      pageWidth: coord.width,
+      pageHeight: coord.height || 50,
+    });
+  });
+
+  return coordinates;
+}
+
+// Optimized file upload with retry
+export async function uploadFileOptimized(uploadUrl: string, file: File, maxRetries = 3) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const uploadResponse = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (uploadResponse.ok) {
+        return { success: true };
+      }
+
+      if (attempt === maxRetries) {
+        return {
+          success: false,
+          error: `Failed to upload after ${maxRetries} attempts`,
+        };
+      }
+
+      // Exponential backoff
+      await new Promise<void>((resolve) => {
+        setTimeout(() => resolve(), Math.pow(2, attempt) * 1000);
+      });
+    } catch (error) {
+      if (attempt === maxRetries) {
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Upload failed',
+        };
+      }
+      await new Promise<void>((resolve) => {
+        setTimeout(() => resolve(), Math.pow(2, attempt) * 1000);
+      });
+    }
+  }
+
+  return { success: false, error: 'Upload failed' };
+}
+
+// Batch field addition using consistent API
+export async function addFieldsBatch(documentId: string, coordinates: FieldCoordinate[]) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/v1/documents/${documentId}/fields`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `${process.env.ADMIN_ACCOUNT_API_KEY ?? ''}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(coordinates),
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return { success: false, error: errorData };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to add fields',
+    };
+  }
+}
+
+// Synchronous reminder scheduling for Lambda compatibility
+export async function scheduleRemindersSync(
+  documentId: string,
+  labelName: string,
+  labelEmail: string,
+) {
+  // Skip QStash in local development (localhost URLs not supported)
+  if (!process.env.VERCEL_URL && !process.env.NODE_ENV?.includes('production')) {
+    console.log('Skipping QStash scheduling in local development');
+    return { success: true };
+  }
+
+  try {
+    // Use Vercel URL in production/preview, fallback to NEXT_PUBLIC_WEBAPP_URL
+    const baseUrl = `https://${process.env.NEXT_PUBLIC_WEBAPP_URL}`;
+
+    const reminderUrl = `${baseUrl}/api/madverse/resend-label-invite`;
+    const reminderData = { documentId, labelName, labelEmail };
+
+    const reminderPromises = [];
+    for (let day = 2; day <= 10; day += 2) {
+      const notBefore = Math.floor((Date.now() + day * 24 * 60 * 60 * 1000) / 1000);
+      const deduplicationId = `reminder-${documentId}-day-${day}`;
+
+      reminderPromises.push(
+        addEventToQueue(
+          reminderUrl,
+          reminderData,
+          deduplicationId,
+          'document-reminders',
+          notBefore,
+        ),
+      );
+    }
+
+    await Promise.all(reminderPromises);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to schedule reminders:', error);
+    return { success: false, error: 'Failed to schedule reminders' };
+  }
+}
+
+// Complete optimized document creation workflow
+export async function createLabelAgreementOptimized({
+  labelName,
+  labelAddress,
+  labelEmail,
+  royaltySplit,
+  usersName,
+}: {
+  labelName: string;
+  labelAddress: string;
+  labelEmail: string;
+  royaltySplit: number;
+  usersName: string;
+}) {
+  const client = getCachedApiClient();
+
+  // Add timeout protection for PDF generation (45s max for Lambda)
+  const pdfTimeout = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error('PDF generation timeout')), 45000);
+  });
+
+  // Phase 1: Parallel PDF generation and recipient setup
+  const recipients = [
+    {
+      name: `${usersName} - ${labelName}`,
+      email: labelEmail,
+      role: 'SIGNER' as const,
+      signingOrder: 1,
+    },
+    {
+      name: 'Suvan Mathur',
+      email: 'suvan.mathur@madverse.co',
+      role: 'SIGNER' as const,
+      signingOrder: 2,
+    },
+  ];
+
+  let pdfResult: Awaited<ReturnType<typeof generatePdfOptimized>>;
+  try {
+    pdfResult = await Promise.race([
+      generatePdfOptimized({ labelName, labelAddress, royaltySplit }),
+      pdfTimeout,
+    ]);
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'PDF generation failed',
+    };
+  }
+
+  if (!pdfResult.success || !pdfResult.file) {
+    return {
+      success: false,
+      error:
+        'success' in pdfResult && !pdfResult.success
+          ? 'Failed to generate PDF'
+          : 'Failed to generate PDF',
+    };
+  }
+
+  // Phase 2: Document creation (must happen first to get upload URL)
+  const docResult = await client.createDocument({
+    body: {
+      title: `${labelName} - Madverse Label Enterprise Plan Agreement`,
+      recipients,
+      meta: {
+        subject: `Please sign the Madverse Label Enterprise Plan Agreement`,
+        message: `Madverse has invited you ${labelName} to sign the Madverse Label Enterprise Plan Agreement`,
+        signingOrder: 'SEQUENTIAL',
+      },
+    },
+  });
+
+  if (docResult.status !== 200) {
+    return { success: false, error: 'Failed to create document' };
+  }
+
+  const { uploadUrl, documentId, recipients: recipientData } = docResult.body;
+
+  // Phase 3: Parallel upload and coordinate preparation
+  const [uploadResult, coordinates] = await Promise.all([
+    uploadFileOptimized(uploadUrl, pdfResult.file),
+    Promise.resolve(
+      prepareSignatureFields(
+        pdfResult.signatureBoxCoordinates,
+        pdfResult.madverseSignatureBoxCoordinates,
+        recipientData,
+      ),
+    ),
+  ]);
+
+  if (!uploadResult.success) {
+    return { success: false, error: 'Failed to upload PDF' };
+  }
+
+  // Phase 4: Add fields and send document in parallel
+  const [addFieldsResult, sendResult] = await Promise.all([
+    addFieldsBatch(String(documentId), coordinates),
+    client.sendDocument({
+      body: {
+        sendEmail: true,
+        sendCompletionEmails: true,
+      },
+      params: {
+        id: String(documentId),
+      },
+    }),
+  ]);
+
+  if (!addFieldsResult.success) {
+    return { success: false, error: 'Failed to add signature fields' };
+  }
+
+  if (sendResult.status !== 200) {
+    return { success: false, error: 'Failed to send document' };
+  }
+
+  // Phase 5: Schedule reminders synchronously for Lambda compatibility
+  const reminderResult = await scheduleRemindersSync(String(documentId), labelName, labelEmail);
+  if (!reminderResult.success) {
+    console.warn('Failed to schedule reminders, but document creation succeeded');
+  }
+
+  return {
+    success: true,
+    documentId,
+    signingUrl: recipientData[0].signingUrl, // Return label signing URL (correct recipient)
+  };
+}

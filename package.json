@@ -66,6 +66,8 @@
     "@documenso/pdf-sign": "^0.1.0",
     "@documenso/prisma": "^0.0.0",
     "@lingui/core": "^4.11.3",
+    "@upstash/redis": "^1.35.0",
+    "@vercel/kv": "^3.0.0",
     "api2pdf": "^2.0.3",
     "inngest-cli": "^0.29.1",
     "luxon": "^3.5.0",
