@@ -104,7 +104,7 @@ export const createDocument = async ({
       const newDocumentData = await putPdfFile({
         name: title.endsWith('.pdf') ? title : `${title}.pdf`,
         type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(normalizedPdf),
+        arrayBuffer: async () => Promise.resolve(normalizedPdf.buffer.slice()),
       });
 
       // eslint-disable-next-line require-atomic-updates
@@ -112,65 +112,70 @@ export const createDocument = async ({
     }
   }
 
-  return await prisma.$transaction(async (tx) => {
-    const document = await tx.document.create({
-      data: {
-        title,
-        externalId,
-        documentDataId,
-        userId,
-        teamId,
-        visibility: determineDocumentVisibility(
-          team?.teamGlobalSettings?.documentVisibility,
-          userTeamRole ?? TeamMemberRole.MEMBER,
-        ),
-        formValues,
-        source: DocumentSource.DOCUMENT,
-        documentMeta: {
-          create: {
-            language: team?.teamGlobalSettings?.documentLanguage,
-            typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled,
-            timezone: timezone,
-          },
-        },
-      },
-    });
-
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
-        documentId: document.id,
-        metadata: requestMetadata,
+  return await prisma.$transaction(
+    async (tx) => {
+      const document = await tx.document.create({
         data: {
           title,
-          source: {
-            type: DocumentSource.DOCUMENT,
+          externalId,
+          documentDataId,
+          userId,
+          teamId,
+          visibility: determineDocumentVisibility(
+            team?.teamGlobalSettings?.documentVisibility,
+            userTeamRole ?? TeamMemberRole.MEMBER,
+          ),
+          formValues,
+          source: DocumentSource.DOCUMENT,
+          documentMeta: {
+            create: {
+              language: team?.teamGlobalSettings?.documentLanguage,
+              typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled,
+              timezone: timezone,
+            },
           },
         },
-      }),
-    });
+      });
 
-    const createdDocument = await tx.document.findFirst({
-      where: {
-        id: document.id,
-      },
-      include: {
-        documentMeta: true,
-        recipients: true,
-      },
-    });
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
+          documentId: document.id,
+          metadata: requestMetadata,
+          data: {
+            title,
+            source: {
+              type: DocumentSource.DOCUMENT,
+            },
+          },
+        }),
+      });
 
-    if (!createdDocument) {
-      throw new Error('Document not found');
-    }
+      const createdDocument = await tx.document.findFirst({
+        where: {
+          id: document.id,
+        },
+        include: {
+          documentMeta: true,
+          recipients: true,
+        },
+      });
 
-    await triggerWebhook({
-      event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(createdDocument)),
-      userId,
-      teamId,
-    });
+      if (!createdDocument) {
+        throw new Error('Document not found');
+      }
 
-    return createdDocument;
-  });
+      await triggerWebhook({
+        event: WebhookTriggerEvents.DOCUMENT_CREATED,
+        data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(createdDocument)),
+        userId,
+        teamId,
+      });
+
+      return createdDocument;
+    },
+    {
+      timeout: 30000, // 30 seconds - increased from default 5 seconds
+    },
+  );
 };
