@@ -104,7 +104,7 @@ export const createDocument = async ({
       const newDocumentData = await putPdfFile({
         name: title.endsWith('.pdf') ? title : `${title}.pdf`,
         type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(normalizedPdf.buffer.slice()),
+        arrayBuffer: async () => Promise.resolve(normalizedPdf),
       });
 
       // eslint-disable-next-line require-atomic-updates
