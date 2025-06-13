@@ -1,6 +1,24 @@
-import { rawTimeZones, timeZonesNames } from '@vvo/tzdb';
+// Minimal timezone data to avoid webpack issues with @vvo/tzdb
+// This is a temporary fix - we can enhance this later
+const MINIMAL_TIMEZONE_DATA = [
+  { name: 'Etc/UTC', rawOffsetInMinutes: 0 },
+  { name: 'America/New_York', rawOffsetInMinutes: -300 },
+  { name: 'Europe/London', rawOffsetInMinutes: 0 },
+  { name: 'Asia/Tokyo', rawOffsetInMinutes: 540 },
+  { name: 'America/Los_Angeles', rawOffsetInMinutes: -480 },
+  { name: 'Asia/Kolkata', rawOffsetInMinutes: 330 }, // India Standard Time (IST) UTC+5:30
+];
 
-export const TIME_ZONE_DATA = rawTimeZones;
+const MINIMAL_TIMEZONE_NAMES = [
+  'Etc/UTC',
+  'America/New_York',
+  'Europe/London',
+  'Asia/Tokyo',
+  'America/Los_Angeles',
+  'Asia/Kolkata',
+];
+
+export const TIME_ZONE_DATA = MINIMAL_TIMEZONE_DATA;
 
 export const DEFAULT_DOCUMENT_TIME_ZONE = 'Etc/UTC';
 
@@ -41,4 +59,4 @@ export const splitTimeZone = (input: string | null): string => {
 
 export const TIME_ZONES_FULL = getGMTOffsets(TIME_ZONE_DATA);
 
-export const TIME_ZONES = ['Etc/UTC', ...timeZonesNames];
+export const TIME_ZONES = ['Etc/UTC', ...MINIMAL_TIMEZONE_NAMES];

@@ -25,10 +25,6 @@ msgstr "\"{0}\" will appear on the document as it has a timezone of \"{timezone}
 msgid "\"{documentName}\" has been deleted by an admin."
 msgstr "\"{documentName}\" has been deleted by an admin."
 
-#: packages/email/template-components/template-document-pending.tsx:37
-msgid "“{documentName}” has been signed"
-msgstr "“{documentName}” has been signed"
-
 #: packages/email/template-components/template-document-completed.tsx:41
 msgid "“{documentName}” was signed by all signers"
 msgstr "“{documentName}” was signed by all signers"
@@ -129,10 +125,6 @@ msgstr "{0} Recipient(s)"
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
 msgstr "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
 
-#: packages/email/templates/document-invite.tsx:87
-msgid "{inviterName} <0>({inviterEmail})</0>"
-msgstr "{inviterName} <0>({inviterEmail})</0>"
-
 #: packages/email/templates/document-cancel.tsx:21
 msgid "{inviterName} has cancelled the document {documentName}, you don't need to sign it anymore."
 msgstr "{inviterName} has cancelled the document {documentName}, you don't need to sign it anymore."
@@ -141,23 +133,19 @@ msgstr "{inviterName} has cancelled the document {documentName}, you don't need 
 msgid "{inviterName} has cancelled the document<0/>\"{documentName}\""
 msgstr "{inviterName} has cancelled the document<0/>\"{documentName}\""
 
-#: packages/email/templates/document-invite.tsx:41
+#: packages/email/templates/document-invite.tsx:42
 msgid "{inviterName} has invited you to {action} {documentName}"
 msgstr "{inviterName} has invited you to {action} {documentName}"
-
-#: packages/email/templates/document-invite.tsx:100
-msgid "{inviterName} has invited you to {action} the document \"{documentName}\"."
-msgstr "{inviterName} has invited you to {action} the document \"{documentName}\"."
 
 #: packages/email/templates/recipient-removed-from-document.tsx:20
 msgid "{inviterName} has removed you from the document {documentName}."
 msgstr "{inviterName} has removed you from the document {documentName}."
 
-#: packages/email/templates/recipient-removed-from-document.tsx:49
+#: packages/email/templates/recipient-removed-from-document.tsx:39
 msgid "{inviterName} has removed you from the document<0/>\"{documentName}\""
 msgstr "{inviterName} has removed you from the document<0/>\"{documentName}\""
 
-#: packages/email/templates/document-invite.tsx:45
+#: packages/email/templates/document-invite.tsx:46
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
 msgstr "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
 
@@ -269,11 +257,11 @@ msgstr "{recipientActionVerb} document"
 msgid "{recipientActionVerb} the document to complete the process."
 msgstr "{recipientActionVerb} the document to complete the process."
 
-#: packages/email/templates/document-created-from-direct-template.tsx:61
+#: packages/email/templates/document-created-from-direct-template.tsx:51
 msgid "{recipientName} {action} a document by using one of your direct links"
 msgstr "{recipientName} {action} a document by using one of your direct links"
 
-#: packages/email/templates/document-rejected.tsx:27
+#: packages/email/templates/document-rejected.tsx:30
 msgid "{recipientName} has rejected the document '{documentName}'"
 msgstr "{recipientName} has rejected the document '{documentName}'"
 
@@ -289,7 +277,7 @@ msgstr "{recipientReference} has signed \"{0}\""
 msgid "{recipientReference} has signed \"{documentName}\""
 msgstr "{recipientReference} has signed \"{documentName}\""
 
-#: packages/email/templates/document-recipient-signed.tsx:27
+#: packages/email/templates/document-recipient-signed.tsx:28
 msgid "{recipientReference} has signed {documentName}"
 msgstr "{recipientReference} has signed {documentName}"
 
@@ -302,7 +290,7 @@ msgstr "{remaningLength, plural, one {# character remaining} other {# characters
 msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "{signerName} has rejected the document \"{documentName}\"."
 
-#: packages/email/templates/document-invite.tsx:46
+#: packages/email/templates/document-invite.tsx:47
 msgid "{teamName} has invited you to {action} {documentName}"
 msgstr "{teamName} has invited you to {action} {documentName}"
 
@@ -1085,7 +1073,7 @@ msgid "Approve"
 msgstr "Approve"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:183
-#: packages/email/template-components/template-document-invite.tsx:52
+#: packages/email/template-components/template-document-invite.tsx:58
 msgid "Approve Document"
 msgstr "Approve Document"
 
@@ -1141,7 +1129,7 @@ msgid "Assist"
 msgstr "Assist"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:184
-#: packages/email/template-components/template-document-invite.tsx:54
+#: packages/email/template-components/template-document-invite.tsx:60
 msgid "Assist Document"
 msgstr "Assist Document"
 
@@ -1542,8 +1530,8 @@ msgstr "Complete Viewing"
 msgid "Completed"
 msgstr "Completed"
 
-#: packages/email/templates/document-completed.tsx:23
-#: packages/email/templates/document-self-signed.tsx:19
+#: packages/email/templates/document-completed.tsx:24
+#: packages/email/templates/document-self-signed.tsx:20
 msgid "Completed Document"
 msgstr "Completed Document"
 
@@ -1988,7 +1976,7 @@ msgstr "Details"
 msgid "Device"
 msgstr "Device"
 
-#: packages/email/templates/reset-password.tsx:71
+#: packages/email/templates/reset-password.tsx:61
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us.</0>"
 msgstr "Didn't request a password change? We are here to help you secure your account, just <0>contact us.</0>"
 
@@ -2843,22 +2831,6 @@ msgstr "Go to your <0>public profile settings</0> to add documents."
 msgid "Green"
 msgstr "Green"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:119
-msgid "has invited you to approve this document"
-msgstr "has invited you to approve this document"
-
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:128
-msgid "has invited you to assist this document"
-msgstr "has invited you to assist this document"
-
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:110
-msgid "has invited you to sign this document"
-msgstr "has invited you to sign this document"
-
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:101
-msgid "has invited you to view this document"
-msgstr "has invited you to view this document"
-
 #: packages/ui/primitives/document-flow/add-signers.tsx:262
 #: packages/ui/primitives/document-flow/add-signers.tsx:300
 #: packages/ui/primitives/document-flow/add-signers.tsx:339
@@ -2900,7 +2872,7 @@ msgstr "Hey I’m Timur"
 msgid "Hi {userName},"
 msgstr "Hi {userName},"
 
-#: packages/email/templates/reset-password.tsx:56
+#: packages/email/templates/reset-password.tsx:46
 msgid "Hi, {userName} <0>({userEmail})</0>"
 msgstr "Hi, {userName} <0>({userEmail})</0>"
 
@@ -3561,22 +3533,6 @@ msgstr "Number"
 msgid "Number format"
 msgstr "Number format"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:115
-msgid "on behalf of \"{0}\" has invited you to approve this document"
-msgstr "on behalf of \"{0}\" has invited you to approve this document"
-
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:124
-msgid "on behalf of \"{0}\" has invited you to assist this document"
-msgstr "on behalf of \"{0}\" has invited you to assist this document"
-
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:106
-msgid "on behalf of \"{0}\" has invited you to sign this document"
-msgstr "on behalf of \"{0}\" has invited you to sign this document"
-
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:97
-msgid "on behalf of \"{0}\" has invited you to view this document"
-msgstr "on behalf of \"{0}\" has invited you to view this document"
-
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:128
 msgid "On this page, you can create a new webhook."
 msgstr "On this page, you can create a new webhook."
@@ -3773,7 +3729,7 @@ msgstr "Payment overdue"
 msgid "Pending"
 msgstr "Pending"
 
-#: packages/email/templates/document-pending.tsx:19
+#: packages/email/templates/document-pending.tsx:20
 msgid "Pending Document"
 msgstr "Pending Document"
 
@@ -3819,7 +3775,7 @@ msgstr "Pick any of the following agreements below and start signing to get star
 msgid "Placeholder"
 msgstr "Placeholder"
 
-#: packages/email/templates/document-invite.tsx:50
+#: packages/email/templates/document-invite.tsx:51
 msgid "Please {action} your document {documentName}"
 msgstr "Please {action} your document {documentName}"
 
@@ -4596,7 +4552,7 @@ msgid "Sign document"
 msgstr "Sign document"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:182
-#: packages/email/template-components/template-document-invite.tsx:50
+#: packages/email/template-components/template-document-invite.tsx:56
 msgid "Sign Document"
 msgstr "Sign Document"
 
@@ -6180,12 +6136,12 @@ msgstr "View all security activity related to your account."
 msgid "View Codes"
 msgstr "View Codes"
 
-#: packages/email/templates/document-created-from-direct-template.tsx:75
+#: packages/email/templates/document-created-from-direct-template.tsx:65
 msgid "View document"
 msgstr "View document"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:181
-#: packages/email/template-components/template-document-invite.tsx:51
+#: packages/email/template-components/template-document-invite.tsx:57
 #: packages/email/template-components/template-document-rejected.tsx:44
 #: packages/ui/primitives/document-flow/add-subject.tsx:90
 #: packages/ui/primitives/document-flow/add-subject.tsx:91
@@ -6496,11 +6452,7 @@ msgstr "We won't send anything to notify recipients."
 msgid "We're all empty"
 msgstr "We're all empty"
 
-#: packages/email/template-components/template-document-pending.tsx:41
-msgid "We're still waiting for other signers to sign this document.<0/>We'll notify you as soon as it's ready."
-msgstr "We're still waiting for other signers to sign this document.<0/>We'll notify you as soon as it's ready."
-
-#: packages/email/templates/reset-password.tsx:65
+#: packages/email/templates/reset-password.tsx:55
 msgid "We've changed your password as you asked. You can now sign in with your new password."
 msgstr "We've changed your password as you asked. You can now sign in with your new password."
 
