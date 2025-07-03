@@ -7,7 +7,7 @@ import crypto from 'crypto';
 
 import { ApiContractV1 } from '@documenso/api/v1/contract';
 
-import { labelInvite } from './madverse-templates';
+import { labelInvite, enterprisePublishingInvite } from './madverse-templates';
 
 const api2pdf = new Api2Pdf(process.env.API2PDF_API_KEY ?? '');
 
@@ -242,6 +242,161 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     return {
       success: false,
       error: 'Failed to generate PDF',
+    };
+  }
+}
+
+export async function generateEnterprisePublishingPdf({ labelName, labelAddress, royaltySplit }: GeneratePdfParams) {
+  try {
+    let htmlContent = enterprisePublishingInvite;
+
+    // Add consistent styling
+    const styleTag = `
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          font-size: 11pt;
+          line-height: 1.4;
+          color: #333;
+        }
+        h1 {
+          font-size: 12pt;
+          font-weight: bold;
+          margin: 8px 0;
+        }
+        p {
+          margin: 6px 0;
+          font-size: 11pt;
+        }
+        .s1, .s2, .s3 {
+          font-size: 11pt;
+        }
+        li {
+          margin: 6px 0;
+        }
+        table {
+          font-size: 11pt;
+        }
+        .page-break {
+          page-break-after: always;
+        }
+      </style>
+    `;
+
+    // Insert style tag before closing head tag
+    htmlContent = htmlContent.replace('</head>', `${styleTag}</head>`);
+
+    // Add today's date in the MADverse signature section
+    const todayDate = new Date().toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    htmlContent = htmlContent.replace('<span class="today-date-box"></span>', todayDate);
+
+    // Replace the placeholder content
+    htmlContent = htmlContent.replace('[Label Name]', labelName);
+    htmlContent = htmlContent.replace(
+      'with registered address at [Label Address]',
+      `with registered address at ${labelAddress}`,
+    );
+    htmlContent = htmlContent.replace(
+      'xxx% (xxx percent)',
+      `${royaltySplit}% (${numberToWords(royaltySplit)} percent)`,
+    );
+    htmlContent = htmlContent.replace('[Date]', todayDate);
+
+    let browser: Browser | BrowserCore;
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+      browser = await puppeteer.launch({
+        args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(
+          `https://github.com/Sparticuz/chromium/releases/download/v132.0.0/chromium-v132.0.0-pack.tar`,
+        ),
+        headless: 'shell',
+      });
+    } else {
+      browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
+    }
+
+    console.log('generateEnterprisePublishingPdf: Browser launched');
+    const page = await browser.newPage();
+
+    // Load HTML content directly instead of from file
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+    // Get coordinates of signature boxes (same as label invite for consistency)
+    const signBoxCoordinates = {
+      x: 30.7,
+      y: 65.2,
+      width: 15.5,
+      height: 4,
+      marker: 'SIGNATURE',
+      pageNumber: 7,
+    };
+
+    const nameBoxCoordinates = {
+      x: 30.7,
+      y: 70.7,
+      width: 15.5,
+      height: 4,
+      marker: 'NAME',
+      pageNumber: 7,
+    };
+
+    const dateBoxCoordinates = {
+      x: 30.7,
+      y: 72.7,
+      width: 15.5,
+      height: 4,
+      marker: 'DATE',
+      pageNumber: 7,
+    };
+
+    const signatureBoxCoordinates = [signBoxCoordinates, nameBoxCoordinates, dateBoxCoordinates];
+    const madverseSignatureBoxCoordinates = {
+      x: 69.6,
+      y: 65.2,
+      width: 15.5,
+      height: 4,
+      marker: 'SIGNATURE',
+      pageNumber: 7,
+    };
+
+    // Generate PDF in memory
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '20mm',
+        right: '20mm',
+        bottom: '20mm',
+        left: '20mm',
+      },
+    });
+
+    await browser.close();
+
+    // Process the PDF in memory
+    const pdfFile = new File([pdfBuffer], `${labelName.replace(/\s+/g, '_')}_enterprise_publishing.pdf`, {
+      type: 'application/pdf',
+    });
+
+    return {
+      success: true,
+      file: pdfFile,
+      signatureBoxCoordinates,
+      madverseSignatureBoxCoordinates,
+    };
+  } catch (error) {
+    console.error('Enterprise Publishing PDF generation failed:', error);
+    return {
+      success: false,
+      error: 'Failed to generate Enterprise Publishing PDF',
     };
   }
 }
