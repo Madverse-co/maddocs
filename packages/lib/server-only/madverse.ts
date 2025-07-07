@@ -597,6 +597,7 @@ export async function scheduleRemindersSync(
   documentId: string,
   labelName: string,
   labelEmail: string,
+  reminderEndpoint: string = '/api/madverse/resend-label-invite',
 ) {
   // Skip QStash in local development (localhost URLs not supported)
   if (!process.env.VERCEL_URL && !process.env.NODE_ENV?.includes('production')) {
@@ -608,7 +609,7 @@ export async function scheduleRemindersSync(
     // Use Vercel URL in production/preview, fallback to NEXT_PUBLIC_WEBAPP_URL
     const baseUrl = `https://${process.env.NEXT_PUBLIC_WEBAPP_URL}`;
 
-    const reminderUrl = `${baseUrl}/api/madverse/resend-label-invite`;
+    const reminderUrl = `${baseUrl}${reminderEndpoint}`;
     const reminderData = { documentId, labelName, labelEmail };
 
     const reminderPromises = [];
@@ -642,12 +643,16 @@ export async function createLabelAgreementOptimized({
   labelEmail,
   royaltySplit,
   usersName,
+  agreementTitle = 'Madverse Label Enterprise Plan Agreement',
+  reminderEndpoint = '/api/madverse/resend-label-invite',
 }: {
   labelName: string;
   labelAddress: string;
   labelEmail: string;
   royaltySplit: number;
   usersName: string;
+  agreementTitle?: string;
+  reminderEndpoint?: string;
 }) {
   const client = getCachedApiClient();
 
@@ -698,11 +703,11 @@ export async function createLabelAgreementOptimized({
   // Phase 2: Document creation (must happen first to get upload URL)
   const docResult = await client.createDocument({
     body: {
-      title: `${labelName} - Madverse Label Enterprise Plan Agreement`,
+      title: `${labelName} - ${agreementTitle}`,
       recipients,
       meta: {
-        subject: `Please sign the Madverse Label Enterprise Plan Agreement`,
-        message: `Madverse has invited you ${labelName} to sign the Madverse Label Enterprise Plan Agreement`,
+        subject: `Please sign the ${agreementTitle}`,
+        message: `Madverse has invited you ${labelName} to sign the ${agreementTitle}`,
         signingOrder: 'SEQUENTIAL',
       },
     },
@@ -753,7 +758,12 @@ export async function createLabelAgreementOptimized({
   }
 
   // Phase 5: Schedule reminders synchronously for Lambda compatibility
-  const reminderResult = await scheduleRemindersSync(String(documentId), labelName, labelEmail);
+  const reminderResult = await scheduleRemindersSync(
+    String(documentId),
+    labelName,
+    labelEmail,
+    reminderEndpoint,
+  );
   if (!reminderResult.success) {
     console.warn('Failed to schedule reminders, but document creation succeeded');
   }
