@@ -59,7 +59,7 @@ function validateRequest(body: unknown): ValidationResult {
   // Validate string fields are not empty
   const stringFields = ['labelName', 'labelAddress', 'usersName'];
   for (const field of stringFields) {
-    if (data[field] && typeof data[field] === 'string' && (data[field] as string).trim() === '') {
+    if (data[field] && typeof data[field] === 'string' && data[field].trim() === '') {
       errors.push(`Field '${field}' cannot be empty`);
     }
   }
@@ -99,14 +99,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { labelName, labelAddress, labelEmail, royaltySplit, usersName } = req.body;
 
-    // Use optimized workflow that runs everything in parallel
+    // Use optimized workflow with Publishing Agreement title
     const result = await createLabelAgreementOptimized({
       labelName,
       labelAddress,
       labelEmail,
-      royaltySplit,
+      publishingRoyaltySplit: royaltySplit,
       usersName,
-      agreementTitle: 'Madverse Label Enterprise Plan Agreement',
+      agreementTitle: 'Publishing Agreement',
       reminderEndpoint: '/api/madverse/resend-label-invite',
     });
 
@@ -122,10 +122,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       success: true,
       documentId: result.documentId,
       signingUrl: result.signingUrl,
-      message: 'Label enterprise agreement created successfully',
+      message: 'Publishing agreement created successfully',
     });
   } catch (error) {
-    console.error('Label agreement creation failed:', error);
+    console.error('Publishing agreement creation failed:', error);
     return res.status(500).json({
       error: 'Internal server error',
       message: 'An unexpected error occurred during document creation. Please try again later.',

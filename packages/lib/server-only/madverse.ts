@@ -14,7 +14,9 @@ const api2pdf = new Api2Pdf(process.env.API2PDF_API_KEY ?? '');
 interface GeneratePdfParams {
   labelName: string;
   labelAddress: string;
-  royaltySplit: number;
+  royaltySplit?: number;
+  distributionRoyaltySplit?: number;
+  publishingRoyaltySplit?: number;
 }
 
 interface CreateDocumentRecipient {
@@ -117,7 +119,13 @@ export const generatePDFBuffer = async (html: string) => {
   return pdfBuffer;
 };
 
-export async function generatePdf({ labelName, labelAddress, royaltySplit }: GeneratePdfParams) {
+export async function generatePdf({
+  labelName,
+  labelAddress,
+  royaltySplit,
+  distributionRoyaltySplit,
+  publishingRoyaltySplit,
+}: GeneratePdfParams) {
   try {
     let htmlContent = labelInvite;
 
@@ -170,10 +178,20 @@ export async function generatePdf({ labelName, labelAddress, royaltySplit }: Gen
     // Replace the placeholder content
     htmlContent = htmlContent.replace('[Label Name]', labelName);
     htmlContent = htmlContent.replace('[Label Address]', labelAddress);
-    htmlContent = htmlContent.replace(
-      '[Royalty Split]',
-      `${royaltySplit}% (${numberToWords(royaltySplit)} percent)`,
-    );
+
+    // Handle royalty split replacement based on agreement type
+    let royaltyText = '';
+    if (distributionRoyaltySplit !== undefined && publishingRoyaltySplit !== undefined) {
+      // Combined agreement - show both splits
+      royaltyText = `Distribution: ${distributionRoyaltySplit}% (${numberToWords(distributionRoyaltySplit)} percent), Publishing: ${publishingRoyaltySplit}% (${numberToWords(publishingRoyaltySplit)} percent)`;
+    } else {
+      // Single agreement - use the provided split
+      const effectiveRoyaltySplit =
+        royaltySplit ?? distributionRoyaltySplit ?? publishingRoyaltySplit ?? 0;
+      royaltyText = `${effectiveRoyaltySplit}% (${numberToWords(effectiveRoyaltySplit)} percent)`;
+    }
+
+    htmlContent = htmlContent.replace('[Royalty Split]', royaltyText);
 
     // Get coordinates of signature boxes
     const signBoxCoordinates = {
@@ -642,6 +660,8 @@ export async function createLabelAgreementOptimized({
   labelAddress,
   labelEmail,
   royaltySplit,
+  distributionRoyaltySplit,
+  publishingRoyaltySplit,
   usersName,
   agreementTitle = 'Madverse Label Enterprise Plan Agreement',
   reminderEndpoint = '/api/madverse/resend-label-invite',
@@ -649,7 +669,9 @@ export async function createLabelAgreementOptimized({
   labelName: string;
   labelAddress: string;
   labelEmail: string;
-  royaltySplit: number;
+  royaltySplit?: number;
+  distributionRoyaltySplit?: number;
+  publishingRoyaltySplit?: number;
   usersName: string;
   agreementTitle?: string;
   reminderEndpoint?: string;
@@ -680,7 +702,13 @@ export async function createLabelAgreementOptimized({
   let pdfResult: Awaited<ReturnType<typeof generatePdfOptimized>>;
   try {
     pdfResult = await Promise.race([
-      generatePdfOptimized({ labelName, labelAddress, royaltySplit }),
+      generatePdfOptimized({
+        labelName,
+        labelAddress,
+        royaltySplit,
+        distributionRoyaltySplit,
+        publishingRoyaltySplit,
+      }),
       pdfTimeout,
     ]);
   } catch (error) {

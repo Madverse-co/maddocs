@@ -28,7 +28,8 @@ function validateRequest(body: unknown): ValidationResult {
     { field: 'labelName', type: 'string' },
     { field: 'labelAddress', type: 'string' },
     { field: 'labelEmail', type: 'string' },
-    { field: 'royaltySplit', type: 'number' },
+    { field: 'distributionRoyaltySplit', type: 'number' },
+    { field: 'publishingRoyaltySplit', type: 'number' },
     { field: 'usersName', type: 'string' },
   ];
 
@@ -49,10 +50,16 @@ function validateRequest(body: unknown): ValidationResult {
     }
   }
 
-  // Validate royalty split range if provided
-  if (data.royaltySplit && typeof data.royaltySplit === 'number') {
-    if (data.royaltySplit < 0 || data.royaltySplit > 100) {
-      errors.push('royaltySplit must be a number between 0 and 100');
+  // Validate royalty split ranges if provided
+  if (data.distributionRoyaltySplit && typeof data.distributionRoyaltySplit === 'number') {
+    if (data.distributionRoyaltySplit < 0 || data.distributionRoyaltySplit > 100) {
+      errors.push('distributionRoyaltySplit must be a number between 0 and 100');
+    }
+  }
+
+  if (data.publishingRoyaltySplit && typeof data.publishingRoyaltySplit === 'number') {
+    if (data.publishingRoyaltySplit < 0 || data.publishingRoyaltySplit > 100) {
+      errors.push('publishingRoyaltySplit must be a number between 0 and 100');
     }
   }
 
@@ -90,24 +97,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         labelName: 'string (required, non-empty)',
         labelAddress: 'string (required, non-empty)',
         labelEmail: 'string (required, valid email format)',
-        royaltySplit: 'number (required, 0-100)',
+        distributionRoyaltySplit: 'number (required, 0-100)',
+        publishingRoyaltySplit: 'number (required, 0-100)',
         usersName: 'string (required, non-empty)',
       },
     });
   }
 
   try {
-    const { labelName, labelAddress, labelEmail, royaltySplit, usersName } = req.body;
+    const {
+      labelName,
+      labelAddress,
+      labelEmail,
+      distributionRoyaltySplit,
+      publishingRoyaltySplit,
+      usersName,
+    } = req.body;
 
     // Use optimized workflow with Label Enterprise Publishing Plan title
     const result = await createLabelAgreementOptimized({
       labelName,
       labelAddress,
       labelEmail,
-      royaltySplit,
+      distributionRoyaltySplit,
+      publishingRoyaltySplit,
       usersName,
       agreementTitle: 'Label Enterprise Publishing Plan',
-      reminderEndpoint: '/api/madverse/resend-label-publishing-invite',
+      reminderEndpoint: '/api/madverse/resend-label-invite',
     });
 
     if (!result.success) {
