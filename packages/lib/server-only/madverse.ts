@@ -240,10 +240,10 @@ export async function generatePdf({
         pageNumber: 1,
       },
     ];
-
+    console.log('First log');
     // Generate PDF in memory
     const pdfBuffer = new Uint8Array(await generatePDFBuffer(htmlContent));
-
+    console.log('Did it reach here?');
     // Process the PDF in memory
     const pdfFile = new File([pdfBuffer], `${labelName.replace(/\s+/g, '_')}.pdf`, {
       type: 'application/pdf',
