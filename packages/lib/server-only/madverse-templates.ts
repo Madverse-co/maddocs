@@ -65,8 +65,8 @@ export const labelInvite = `<!DOCTYPE html>
 <body>
     <div class="container">
         <h1>ADDENDUM TO MADVERSE LABEL SERVICES AGREEMENT</h1>
-        <p>This addendum (the "<b>Addendum</b>") to the MADverse Label Services Agreement is effective as of [Today Date] and is by and between <b>Nesho Entertainment Private Limited ("MADverse")</b> and <b>[Label Name], with registered address at [Label Address] ("Label")</b>.</p>
-        
+        <p>This addendum (the "<b>Addendum</b>") to the <a href="https://cdn.madverse.it/distribution-services-agreement.pdf" target="_blank">MADverse Label Services Agreement</a> is effective as of [Today Date] and is by and between <b>Nesho Entertainment Private Limited ("MADverse")</b> and <b>[Label Name], with registered address at [Label Address] ("Label")</b>.</p>
+
         <p>NOW THEREFORE, in consideration of the promises and mutual covenants, it is agreed that:</p>
         <ul>
             <li>The Label is entitled to distribute content for unlimited artists as specified in Clause II.</li>
@@ -77,7 +77,7 @@ export const labelInvite = `<!DOCTYPE html>
             <li>Upon termination, MADverse shall takedown content upon written request.</li>
             <li>This Addendum is governed by the Online Terms & Conditions.</li>
         </ul>
-        
+
         <div class="table-container">
             <table>
                 <tr>
@@ -90,7 +90,7 @@ export const labelInvite = `<!DOCTYPE html>
                 </tr>
             </table>
         </div>
-        
+
         <div class="signature">
             <div>Authorized Signatory</div>
             <div>Authorized Signatory</div>
