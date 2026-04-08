@@ -3,7 +3,7 @@ export const labelInvite = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MADverse Enterprise Plan Addendum</title>
+    <title>Madverse Enterprise Plan Addendum</title>
     <style>
         body {
             font-family: "Inter", sans-serif;
@@ -65,15 +65,15 @@ export const labelInvite = `<!DOCTYPE html>
 <body>
     <div class="container">
         <h1>ADDENDUM TO MADVERSE LABEL SERVICES AGREEMENT</h1>
-        <p>This addendum (the "<b>Addendum</b>") to the <a href="https://cdn.madverse.it/distribution-services-agreement.pdf" target="_blank">MADverse Label Services Agreement</a> is effective as of [Today Date] and is by and between <b>Nesho Entertainment Private Limited ("MADverse")</b> and <b>[Label Name], with registered address at [Label Address] ("Label")</b>.</p>
+        <p>This addendum (the "<b>Addendum</b>") to the <a href="https://cdn.madverse.it/distribution-services-agreement.pdf" target="_blank">Madverse Label Services Agreement</a> is effective as of [Today Date] and is by and between <b>Nesho Entertainment Private Limited ("Madverse")</b> and <b>[Label Name], with registered address at [Label Address] ("Label")</b>.</p>
 
         <p>NOW THEREFORE, in consideration of the promises and mutual covenants, it is agreed that:</p>
         <ul>
             <li>The Label is entitled to distribute content for unlimited artists as specified in Clause II.</li>
-            <li>MADverse shall retain [Royalty Split] of Net Receipts generated.</li>
+            <li>Madverse shall retain [Royalty Split] of Net Receipts generated.</li>
             <li>This Addendum remains valid unless terminated by either party.</li>
             <li>The Label may terminate this Addendum via written notice (emails permitted).</li>
-            <li>MADverse reserves the right to suspend or restrict access with reasonable prior notice.</li>
+            <li>Madverse reserves the right to suspend or restrict access with reasonable prior notice.</li>
             <li>Upon termination, MADverse shall takedown content upon written request.</li>
             <li>This Addendum is governed by the Online Terms & Conditions.</li>
         </ul>
