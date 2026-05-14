@@ -109,6 +109,11 @@ export const PDFViewer = ({
       return;
     }
 
+    const $link = $el.closest('a[href]');
+    if ($link && $page.contains($link)) {
+      return;
+    }
+
     const { height, width, top, left } = $page.getBoundingClientRect();
 
     const pageX = event.clientX - left;
@@ -249,7 +254,7 @@ export const PDFViewer = ({
                     <PDFPage
                       pageNumber={i + 1}
                       width={width}
-                      renderAnnotationLayer={false}
+                      renderAnnotationLayer
                       renderTextLayer={false}
                       loading={() => ''}
                       onClick={(e) => onDocumentPageClick(e, i + 1)}
