@@ -66,8 +66,14 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
     document.team?.url,
   )}/${document.id}`;
 
-  // MADVERSE WEBHOOK
-  await sendAgreementCompletedWebhook(document.id, document.recipients[0].email, pdfS3Key);
+  // MADVERSE WEBHOOK — use the first signer (lowest signingOrder), not arbitrary recipient order
+  const primarySigner =
+    [...document.recipients]
+      .filter((r) => r.role !== 'CC')
+      .sort((a, b) => (a.signingOrder ?? 999) - (b.signingOrder ?? 999))[0] ??
+    document.recipients[0];
+
+  await sendAgreementCompletedWebhook(document.id, primarySigner.email, pdfS3Key);
 
   if (document.team?.url) {
     documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${document.team.url}/documents/${

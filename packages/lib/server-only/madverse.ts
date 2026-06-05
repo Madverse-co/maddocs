@@ -7,7 +7,26 @@ import crypto from 'crypto';
 
 import { ApiContractV1 } from '@documenso/api/v1/contract';
 
+import {
+  buildDefaultOwnerAliases,
+  buildOwnerPartyLine,
+  shouldIncludeIprsSchedule,
+  type DiyOwnerType,
+} from './madverse-diy-artist-helpers';
+import {
+  DIY_MADVERSE_WITNESS_FIELDS,
+  DIY_OWNER_IPRS_FIELDS,
+  DIY_OWNER_WITNESS_FIELDS,
+} from './madverse-diy-artist-coordinates';
+import { getMadverseStampHtml, getOwnerStampHtml } from './madverse-diy-artist-stamps';
+import { getDiyArtistSubPublisherAgreement } from './madverse-diy-artist-template';
 import { labelInvite } from './madverse-templates';
+
+export const DIY_MADVERSE_SIGNER = {
+  name: 'Rohan Jain',
+  email: 'amantiwari0309@gmail.com',
+  role: 'CEO' as const,
+};
 
 const api2pdf = new Api2Pdf(process.env.API2PDF_API_KEY ?? '');
 
@@ -399,6 +418,8 @@ interface SignatureCoordinate {
 interface RecipientData {
   recipientId: string;
   signingUrl: string;
+  email?: string;
+  signingOrder?: number | null;
 }
 
 interface FieldCoordinate {
@@ -409,6 +430,36 @@ interface FieldCoordinate {
   pageY: number;
   pageWidth: number;
   pageHeight: number;
+  fieldMeta?: {
+    type: 'date';
+    fontSize: number;
+    textAlign: 'left';
+  };
+}
+
+const DIY_DATE_FIELD_META = {
+  type: 'date' as const,
+  fontSize: 8,
+  textAlign: 'left' as const,
+};
+
+function mapDiyFieldCoordinate(
+  coord: SignatureCoordinate,
+  recipientId: string,
+): FieldCoordinate {
+  const type =
+    coord.marker === 'DATE' ? 'DATE' : coord.marker === 'NAME' ? 'NAME' : 'SIGNATURE';
+
+  return {
+    recipientId: Number(recipientId),
+    type,
+    pageNumber: coord.pageNumber || 1,
+    pageX: coord.x,
+    pageY: coord.y,
+    pageWidth: coord.width,
+    pageHeight: coord.height,
+    ...(type === 'DATE' ? { fieldMeta: DIY_DATE_FIELD_META } : {}),
+  };
 }
 
 interface CachedPdfData {
@@ -428,19 +479,24 @@ try {
   console.log('Upstash Redis not available, PDF caching disabled:', error);
 }
 
-// Singleton API client
+// Singleton API client (recreated when base URL changes — avoids stale prod URL after .env update)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let cachedApiClient: any = null;
+let cachedApiClientBaseUrl: string | null = null;
 
 function getCachedApiClient() {
-  if (!cachedApiClient) {
+  const baseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL ?? '';
+
+  if (!cachedApiClient || cachedApiClientBaseUrl !== baseUrl) {
+    cachedApiClientBaseUrl = baseUrl;
     cachedApiClient = initClient(ApiContractV1, {
-      baseUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}`,
+      baseUrl,
       baseHeaders: {
         authorization: `${process.env.ADMIN_ACCOUNT_API_KEY ?? ''}`,
       },
     });
   }
+
   return cachedApiClient;
 }
 
@@ -494,25 +550,24 @@ export async function generatePdfOptimized(params: GeneratePdfParams) {
   return result;
 }
 
-// Pre-process signature field coordinates
+function getFieldTypeFromMarker(marker: string) {
+  switch (marker) {
+    case 'NAME':
+      return 'NAME';
+    case 'DATE':
+      return 'DATE';
+    case 'SIGNATURE':
+      return 'SIGNATURE';
+    default:
+      return 'SIGNATURE';
+  }
+}
+
 export function prepareSignatureFields(
   userCoordinates: SignatureCoordinate[],
   madverseCoordinates: SignatureCoordinate[],
   recipientData: RecipientData[],
 ): FieldCoordinate[] {
-  const getFieldTypeFromMarker = (marker: string) => {
-    switch (marker) {
-      case 'NAME':
-        return 'NAME';
-      case 'DATE':
-        return 'DATE';
-      case 'SIGNATURE':
-        return 'SIGNATURE';
-      default:
-        return 'SIGNATURE';
-    }
-  };
-
   const coordinates = userCoordinates.map((coord) => ({
     recipientId: Number(recipientData[0].recipientId),
     type: getFieldTypeFromMarker(coord.marker),
@@ -538,7 +593,36 @@ export function prepareSignatureFields(
   return coordinates;
 }
 
-// Optimized file upload with retry
+function prepareDiySignatureFields(
+  userCoordinates: SignatureCoordinate[],
+  madverseCoordinates: SignatureCoordinate[],
+  recipientData: RecipientData[],
+): FieldCoordinate[] {
+  const ownerRecipient =
+    recipientData.find((r) => r.signingOrder === 1) ??
+    recipientData.find((r) => r.email !== DIY_MADVERSE_SIGNER.email) ??
+    recipientData[0];
+
+  const madverseRecipient =
+    recipientData.find((r) => r.signingOrder === 2) ??
+    recipientData.find((r) => r.email === DIY_MADVERSE_SIGNER.email) ??
+    recipientData[1];
+
+  if (!ownerRecipient || !madverseRecipient) {
+    throw new Error('Could not resolve owner and Madverse recipients for signature fields');
+  }
+
+  const coordinates = userCoordinates.map((coord) =>
+    mapDiyFieldCoordinate(coord, ownerRecipient.recipientId),
+  );
+
+  madverseCoordinates.forEach((coord) => {
+    coordinates.push(mapDiyFieldCoordinate(coord, madverseRecipient.recipientId));
+  });
+
+  return coordinates;
+}
+
 export async function uploadFileOptimized(uploadUrl: string, file: File, maxRetries = 3) {
   const formData = new FormData();
   formData.append('file', file);
@@ -802,3 +886,282 @@ export async function createLabelAgreementOptimized({
     signingUrl: recipientData[0].signingUrl, // Return label signing URL (correct recipient)
   };
 }
+
+// DIY ARTIST SUB-PUBLISHER AGREEMENT
+// ===================================
+
+export interface GenerateDiyArtistPdfParams {
+  ownerType: DiyOwnerType;
+  artistName: string;
+  signatoryName?: string;
+  legalName?: string;
+  ownerDesignation: string;
+  ownerAddress: string;
+  ownerEmail: string;
+  ownerAliases?: string | string[];
+  usersName: string;
+  ipiNumber?: string;
+  effectiveDate?: Date;
+}
+
+function formatAgreementDate(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+export function getDiyArtistSignatureCoordinates(includeIprs: boolean) {
+  const ownerSignatureBoxCoordinates = [...DIY_OWNER_WITNESS_FIELDS];
+
+  if (includeIprs) {
+    ownerSignatureBoxCoordinates.push(...DIY_OWNER_IPRS_FIELDS);
+  }
+
+  const madverseSignatureBoxCoordinates = [...DIY_MADVERSE_WITNESS_FIELDS];
+
+  return { ownerSignatureBoxCoordinates, madverseSignatureBoxCoordinates };
+}
+
+export async function generateDiyArtistPdf({
+  ownerType,
+  artistName,
+  signatoryName,
+  legalName,
+  ownerDesignation,
+  ownerAddress,
+  ownerAliases,
+  ipiNumber,
+  effectiveDate = new Date(),
+}: Omit<GenerateDiyArtistPdfParams, 'ownerEmail' | 'usersName'>) {
+  try {
+    const effectiveDateFormatted = formatAgreementDate(effectiveDate);
+    const signatory = (signatoryName ?? artistName).trim();
+    const includeIprs = shouldIncludeIprsSchedule(ownerType);
+
+    const extraAliases = ownerAliases
+      ? Array.isArray(ownerAliases)
+        ? ownerAliases
+        : ownerAliases.split(/[\n,]+/).map((a) => a.trim())
+      : [];
+
+    const aliasList = buildDefaultOwnerAliases({ ownerType, artistName, extraAliases });
+    const aliasesHtml = aliasList.map((a) => escapeHtml(a)).join('<br />');
+
+    const ownerPartyLine = buildOwnerPartyLine({
+      ownerType,
+      artistName,
+      signatoryName: signatory,
+      ownerDesignation,
+      legalName,
+    });
+
+    const ipi = ipiNumber?.trim() || '—';
+
+    let htmlContent = getDiyArtistSubPublisherAgreement();
+
+    if (!includeIprs) {
+      htmlContent = htmlContent.replace(
+        /<!--BEGIN_IPRS_SCHEDULE-->[\s\S]*?<!--END_IPRS_SCHEDULE-->/,
+        '',
+      );
+    }
+
+    htmlContent = htmlContent.replace(/\[Effective Date\]/g, effectiveDateFormatted);
+    htmlContent = htmlContent.replace(/\[Owner Party Line\]/g, escapeHtml(ownerPartyLine));
+    htmlContent = htmlContent.replace(/\[Signatory Name\]/g, escapeHtml(signatory));
+    htmlContent = htmlContent.replace(/\[Owner Designation\]/g, escapeHtml(ownerDesignation));
+    htmlContent = htmlContent.replace(/\[Owner Address\]/g, escapeHtml(ownerAddress));
+    htmlContent = htmlContent.replace(/\[Owner Aliases\]/g, aliasesHtml);
+    htmlContent = htmlContent.replace(/\[Owner Stamp\]/g, getOwnerStampHtml(artistName, ownerType));
+    htmlContent = htmlContent.replace(/\[Madverse Stamp\]/g, getMadverseStampHtml());
+    htmlContent = htmlContent.replace(/\[IPI Number\]/g, escapeHtml(ipi));
+
+    const pdfBuffer = new Uint8Array(await generatePDFBuffer(htmlContent));
+    const pdfFile = new File(
+      [pdfBuffer],
+      `${artistName.replace(/\s+/g, '_')}_Sub-Publisher_Agreement.pdf`,
+      { type: 'application/pdf' },
+    );
+
+    const { ownerSignatureBoxCoordinates, madverseSignatureBoxCoordinates } =
+      getDiyArtistSignatureCoordinates(includeIprs);
+
+    return {
+      success: true as const,
+      file: pdfFile,
+      signatureBoxCoordinates: ownerSignatureBoxCoordinates,
+      madverseSignatureBoxCoordinates,
+    };
+  } catch (error) {
+    console.error('DIY artist PDF generation failed:', error);
+    return {
+      success: false as const,
+      error: 'Failed to generate PDF',
+    };
+  }
+}
+
+export async function createDiyArtistAgreementOptimized({
+  ownerType,
+  artistName,
+  signatoryName,
+  legalName,
+  ownerDesignation,
+  ownerAddress,
+  ownerEmail,
+  ownerAliases,
+  usersName,
+  ipiNumber,
+  effectiveDate,
+  agreementTitle = 'Madverse Sub-Publisher Services Agreement',
+  reminderEndpoint = '/api/madverse/resend-label-invite',
+}: GenerateDiyArtistPdfParams & {
+  agreementTitle?: string;
+  reminderEndpoint?: string;
+}) {
+  const client = getCachedApiClient();
+
+  const pdfTimeout = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error('PDF generation timeout')), 45000);
+  });
+
+  const signatory = (signatoryName ?? artistName).trim();
+
+  const recipients = [
+    {
+      name: `${usersName} - ${signatory}`,
+      email: ownerEmail,
+      role: 'SIGNER' as const,
+      signingOrder: 1,
+    },
+    {
+      name: DIY_MADVERSE_SIGNER.name,
+      email: DIY_MADVERSE_SIGNER.email,
+      role: 'SIGNER' as const,
+      signingOrder: 2,
+    },
+  ];
+
+  let pdfResult: Awaited<ReturnType<typeof generateDiyArtistPdf>>;
+  try {
+    pdfResult = await Promise.race([
+      generateDiyArtistPdf({
+        ownerType,
+        artistName,
+        signatoryName: signatory,
+        legalName,
+        ownerDesignation,
+        ownerAddress,
+        ownerAliases,
+        ipiNumber,
+        effectiveDate,
+      }),
+      pdfTimeout,
+    ]);
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'PDF generation failed',
+    };
+  }
+
+  if (!pdfResult.success || !pdfResult.file) {
+    return {
+      success: false,
+      error: 'Failed to generate PDF',
+    };
+  }
+
+  const docResult = await client.createDocument({
+    body: {
+      title: `${artistName} - ${agreementTitle}`,
+      recipients,
+      meta: {
+        subject: `Please sign the ${agreementTitle}`,
+        message: `Madverse has invited ${signatory} to sign the ${agreementTitle}`,
+        signingOrder: 'SEQUENTIAL',
+      },
+    },
+  });
+
+  if (docResult.status !== 200) {
+    console.error('[createDiyArtistAgreement] createDocument failed', {
+      status: docResult.status,
+      body: docResult.body,
+      baseUrl: process.env.NEXT_PUBLIC_WEBAPP_URL,
+      ownerEmail,
+    });
+    return {
+      success: false,
+      error: 'Failed to create document',
+      step: 'createDocument',
+      apiStatus: docResult.status,
+      apiBody: docResult.body,
+    };
+  }
+
+  const { uploadUrl, documentId, recipients: recipientData } = docResult.body;
+
+  const [uploadResult, coordinates] = await Promise.all([
+    uploadFileOptimized(uploadUrl, pdfResult.file),
+    Promise.resolve(
+      prepareDiySignatureFields(
+        pdfResult.signatureBoxCoordinates,
+        pdfResult.madverseSignatureBoxCoordinates,
+        recipientData,
+      ),
+    ),
+  ]);
+
+  if (!uploadResult.success) {
+    return { success: false, error: 'Failed to upload PDF' };
+  }
+
+  const [addFieldsResult, sendResult] = await Promise.all([
+    addFieldsBatch(String(documentId), coordinates),
+    client.sendDocument({
+      body: {
+        sendEmail: true,
+        sendCompletionEmails: true,
+      },
+      params: {
+        id: String(documentId),
+      },
+    }),
+  ]);
+
+  if (!addFieldsResult.success) {
+    return { success: false, error: 'Failed to add signature fields' };
+  }
+
+  if (sendResult.status !== 200) {
+    return { success: false, error: 'Failed to send document' };
+  }
+
+  const reminderResult = await scheduleRemindersSync(
+    String(documentId),
+    signatory,
+    ownerEmail,
+    reminderEndpoint,
+  );
+  if (!reminderResult.success) {
+    console.warn('Failed to schedule reminders, but document creation succeeded');
+  }
+
+  return {
+    success: true,
+    documentId,
+    signingUrl: recipientData[0].signingUrl,
+  };
+}
+export type { DiyOwnerType } from './madverse-diy-artist-helpers';
