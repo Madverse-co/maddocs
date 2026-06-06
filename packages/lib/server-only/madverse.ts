@@ -24,7 +24,7 @@ import { labelInvite } from './madverse-templates';
 
 export const DIY_MADVERSE_SIGNER = {
   name: 'Rohan Jain',
-  email: 'amantiwari0309@gmail.com',
+  email: 'rohan@madverse.co',
   role: 'CEO' as const,
 };
 
