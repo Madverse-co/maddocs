@@ -85,7 +85,12 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
       return;
     }
 
-    await fetch(`${process.env.MADVERSE_DOMAIN}/api/agreement-webhook`, {
+    const nameParts = recipientName.split(' - ');
+    const webhookSignerName = nameParts[0]?.trim() || recipientName || recipientEmail;
+    const webhookSignerLabel =
+      nameParts.slice(1).join(' - ').trim() || webhookSignerName;
+
+    const webhookResponse = await fetch(`${process.env.MADVERSE_DOMAIN}/api/agreement-webhook`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -94,13 +99,20 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
       body: JSON.stringify({
         event: 'AGREEMENT_SIGNED_BY_USER',
         payload: {
-          name: recipientName.split(' - ')[0],
-          label: recipientName.split(' - ')[1],
+          name: webhookSignerName,
+          label: webhookSignerLabel,
           email: recipientEmail,
-          documentId
+          documentId,
         },
       }),
     });
+
+    if (!webhookResponse.ok) {
+      const errorText = await webhookResponse.text().catch(() => 'Unknown error');
+      console.error(
+        `Event: AGREEMENT_SIGNED_BY_USER - Failed to send webhook for recipient ${recipientEmail}: HTTP ${webhookResponse.status} - ${errorText.slice(0, 500)}`,
+      );
+    }
 
     const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
     const i18n = await getI18nInstance(document.documentMeta?.language);

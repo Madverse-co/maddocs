@@ -36,6 +36,7 @@ import { getTemplateById } from '@documenso/lib/server-only/template/get-templat
 import { extractDerivedDocumentEmailSettings } from '@documenso/lib/types/document-email';
 import {
   ZCheckboxFieldMeta,
+  ZDateFieldMeta,
   ZDropdownFieldMeta,
   ZFieldMetaSchema,
   ZNumberFieldMeta,
@@ -378,6 +379,9 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 404,
         body: {
           message: 'An error has occured while uploading the file',
+          ...(process.env.NODE_ENV === 'development' && {
+            debug: err instanceof Error ? err.message : String(err),
+          }),
         },
       };
     }
@@ -1067,7 +1071,13 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               );
             }
 
-            if (fieldMeta && fieldMeta.type.toLowerCase() !== String(type).toLowerCase()) {
+            if (
+              fieldMeta &&
+              typeof fieldMeta === 'object' &&
+              'type' in fieldMeta &&
+              typeof fieldMeta.type === 'string' &&
+              fieldMeta.type.toLowerCase() !== String(type).toLowerCase()
+            ) {
               console.error('[createField] Field meta type mismatch', {
                 expected: type,
                 received: fieldMeta.type,
@@ -1075,22 +1085,47 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               throw new Error('Field meta type does not match the field type');
             }
 
-            const result = match(type)
-              .with('RADIO', () => ZRadioFieldMeta.safeParse(fieldMeta))
-              .with('CHECKBOX', () => ZCheckboxFieldMeta.safeParse(fieldMeta))
-              .with('DROPDOWN', () => ZDropdownFieldMeta.safeParse(fieldMeta))
-              .with('NUMBER', () => ZNumberFieldMeta.safeParse(fieldMeta))
-              .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
-              .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
-                success: true,
-                data: undefined,
-              }))
-              .with('FREE_SIGNATURE', () => ({
-                success: false,
-                error: 'FREE_SIGNATURE is not supported',
-                data: undefined,
-              }))
-              .exhaustive();
+            let result:
+              | { success: true; data: unknown }
+              | { success: false; error?: unknown; data?: undefined };
+
+            switch (String(type)) {
+              case 'DATE':
+                result = ZDateFieldMeta.safeParse(
+                  fieldMeta ?? { type: 'date', fontSize: 8, textAlign: 'left' },
+                );
+                break;
+              case 'RADIO':
+                result = ZRadioFieldMeta.safeParse(fieldMeta);
+                break;
+              case 'CHECKBOX':
+                result = ZCheckboxFieldMeta.safeParse(fieldMeta);
+                break;
+              case 'DROPDOWN':
+                result = ZDropdownFieldMeta.safeParse(fieldMeta);
+                break;
+              case 'NUMBER':
+                result = ZNumberFieldMeta.safeParse(fieldMeta);
+                break;
+              case 'TEXT':
+                result = ZTextFieldMeta.safeParse(fieldMeta);
+                break;
+              case 'SIGNATURE':
+              case 'INITIALS':
+              case 'EMAIL':
+              case 'NAME':
+                result = { success: true, data: undefined };
+                break;
+              case 'FREE_SIGNATURE':
+                result = {
+                  success: false,
+                  error: 'FREE_SIGNATURE is not supported',
+                  data: undefined,
+                };
+                break;
+              default:
+                throw new Error(`Unsupported field type: ${String(type)}`);
+            }
 
             if (!result.success) {
               console.error('[createField] Field meta parsing failed', {
@@ -1100,6 +1135,9 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             }
 
             console.log(`[createField] Creating field ${index + 1}`, { type });
+            const parsedFieldMeta =
+              result.data !== undefined ? ZFieldMetaSchema.parse(result.data) : undefined;
+
             const field = await tx.field.create({
               data: {
                 documentId: Number(documentId),
@@ -1112,7 +1150,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
                 height: pageHeight,
                 customText: '',
                 inserted: false,
-                fieldMeta: result.data,
+                fieldMeta: parsedFieldMeta,
               },
               include: {
                 recipient: true,
@@ -1130,7 +1168,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
                 },
                 data: {
                   fieldId: field.secondaryId,
-                  fieldRecipientEmail: field.recipient?.email ?? '',
+                  fieldRecipientEmail: recipient.email,
                   fieldRecipientId: recipientId,
                   fieldType: field.type,
                 },
