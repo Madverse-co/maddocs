@@ -74,12 +74,9 @@ function validateRequest(body: unknown): ValidationResult {
     }
   }
 
-  const normalizedOwnerType =
-    typeof data.ownerType === 'string' ? normalizeOwnerType(data.ownerType) : null;
-
-  if (normalizedOwnerType === 'ARTIST') {
-    if (!data.ipiNumber || typeof data.ipiNumber !== 'string' || !String(data.ipiNumber).trim()) {
-      errors.push('ipiNumber is required when ownerType is ARTIST');
+  if (data.ipiNumber !== undefined && data.ipiNumber !== null && data.ipiNumber !== '') {
+    if (typeof data.ipiNumber !== 'string') {
+      errors.push('ipiNumber must be a string');
     }
   }
 
@@ -126,7 +123,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ownerEmail: 'string (required)',
         usersName: 'string (required)',
         ownerAliases: 'string | string[] (optional)',
-        ipiNumber: 'string (required for ARTIST only)',
+        ipiNumber: 'string (optional)',
       },
     });
   }
