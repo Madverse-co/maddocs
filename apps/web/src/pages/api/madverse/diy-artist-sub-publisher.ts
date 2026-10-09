@@ -187,6 +187,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       success: true,
       documentId: result.documentId,
       signingUrl: result.signingUrl,
+      madverseSigningUrl: result.madverseSigningUrl,
+      madverseSignerEmail: result.madverseSignerEmail,
+      madverseSignerName: result.madverseSignerName,
       ownerType,
       message: 'Madverse sub-publisher agreement created successfully',
     });
