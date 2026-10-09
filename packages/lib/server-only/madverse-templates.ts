@@ -85,7 +85,7 @@ export const labelInvite = `<!DOCTYPE html>
                     <th>For the Label</th>
                 </tr>
                 <tr>
-                    <td><b>Suvan Mathur</b><br>VP Growth (Distribution, Operations & Relations)<br>Date: [Suvan Date]</td>
+                    <td><b>Monika Pancham</b><br>Head of Enterprise Growth and Publishing<br>Date: [Monika Date]</td>
                     <td><b>_____________________</b><br>Date: ___________</td>
                 </tr>
             </table>
