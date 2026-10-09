@@ -1162,6 +1162,10 @@ export async function createDiyArtistAgreementOptimized({
     success: true,
     documentId,
     signingUrl: recipientData[0].signingUrl,
+    madverseSigningUrl: recipientData[1]?.signingUrl,
+    madverseSignerEmail: DIY_MADVERSE_SIGNER.email,
+    madverseSignerName: DIY_MADVERSE_SIGNER.name,
   };
 }
+
 export type { DiyOwnerType } from './madverse-diy-artist-helpers';
