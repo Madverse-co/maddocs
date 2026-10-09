@@ -191,7 +191,7 @@ export async function generatePdf({
       year: 'numeric',
     });
     htmlContent = htmlContent.replace('[Today Date]', todayDate);
-    htmlContent = htmlContent.replace('[Suvan Date]', '');
+    htmlContent = htmlContent.replace('[Monika Date]', '');
     htmlContent = htmlContent.replace('For the Label', `For ${labelName}`);
 
     // Replace the placeholder content
@@ -776,8 +776,8 @@ export async function createLabelAgreementOptimized({
       signingOrder: 1,
     },
     {
-      name: 'Suvan Mathur',
-      email: 'suvan.mathur@madverse.co',
+      name: 'Monika Pancham',
+      email: 'monika.pancham@madverse.co',
       role: 'SIGNER' as const,
       signingOrder: 2,
     },
