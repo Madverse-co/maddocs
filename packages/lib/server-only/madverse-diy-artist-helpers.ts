@@ -36,7 +36,9 @@ export function buildOwnerPartyLine({
   }
 
   const ownedBy = legalName?.trim() ? ` (Owned by : ${legalName.trim()})` : '';
-  return `${name} Official${ownedBy}`;
+  // Temporary: drop the " Official" label suffix while ~33 agreements are
+  // reissued with exact legal names. Restore `${name} Official${ownedBy}` after.
+  return `${name}${ownedBy}`;
 }
 
 export function buildDefaultOwnerAliases({
@@ -51,7 +53,8 @@ export function buildDefaultOwnerAliases({
     return extras.length > 0 ? extras : [name];
   }
 
-  const defaults = [`${name} Official`];
+  // Temporary: match party-line change — use exact name, not `${name} Official`.
+  const defaults = [name];
   const merged = [...defaults, ...extras.filter((a) => a !== defaults[0])];
   return merged;
 }
