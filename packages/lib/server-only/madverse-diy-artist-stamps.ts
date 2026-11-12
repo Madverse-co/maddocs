@@ -43,10 +43,7 @@ function getOwnerStampLabel(artistName: string, ownerType: DiyOwnerType): string
     return base;
   }
 
-  // Temporary: drop the " OFFICIAL" stamp suffix to match party-line / alias
-  // changes while ~33 agreements are reissued with exact legal names.
-  // Restore `${base} OFFICIAL` after that batch.
-  return base;
+  return `${base} OFFICIAL`;
 }
 
 function escapeSvgText(value: string) {
