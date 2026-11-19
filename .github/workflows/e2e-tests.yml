@@ -1,9 +1,8 @@
 name: Playwright Tests
+# GHA minute diet (2026-11-19): auto triggers disabled — run manually if needed.
 on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+  workflow_dispatch:
+
 jobs:
   e2e_tests:
     name: 'E2E Tests'

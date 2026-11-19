@@ -1,8 +1,7 @@
 name: cleanup caches by a branch
+# GHA minute diet (2026-11-19): auto triggers disabled — run manually if needed.
 on:
-  pull_request:
-    types:
-      - closed
+  workflow_dispatch:
 
 jobs:
   cleanup:

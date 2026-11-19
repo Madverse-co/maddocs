@@ -1,10 +1,8 @@
 name: 'Extract and upload translations'
+# GHA minute diet (2026-11-19): auto triggers disabled — run manually if needed.
 
 on:
   workflow_dispatch:
-  workflow_call:
-  push:
-    branches: ['main']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}

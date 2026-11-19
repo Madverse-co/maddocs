@@ -1,11 +1,8 @@
 name: 'CodeQL'
+# GHA minute diet (2026-11-19): auto triggers disabled — run manually if needed.
 
 on:
   workflow_dispatch:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
 
 jobs:
   analyze:

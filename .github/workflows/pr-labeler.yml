@@ -1,7 +1,8 @@
 name: 'PR Labeler'
+# GHA minute diet (2026-11-19): auto triggers disabled — run manually if needed.
 
 on:
-  - pull_request_target
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

@@ -1,8 +1,8 @@
 name: Auto Label Assigned Issues
+# GHA minute diet (2026-11-19): auto triggers disabled — run manually if needed.
 
 on:
-  issues:
-    types: [assigned]
+  workflow_dispatch:
 
 jobs:
   label-when-assigned:

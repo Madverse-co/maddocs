@@ -1,12 +1,8 @@
 name: 'Validate PR Name'
+# GHA minute diet (2026-11-19): auto triggers disabled — run manually if needed.
 
 on:
-  pull_request_target:
-    types:
-      - opened
-      - reopened
-      - edited
-      - synchronize
+  workflow_dispatch:
 
 permissions:
   pull-requests: write

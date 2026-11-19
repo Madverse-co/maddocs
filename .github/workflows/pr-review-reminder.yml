@@ -1,8 +1,8 @@
 name: 'PR Review Reminder'
+# GHA minute diet (2026-11-19): auto triggers disabled — run manually if needed.
 
 on:
-  pull_request:
-    types: ['opened', 'ready_for_review']
+  workflow_dispatch:
 
 permissions:
   pull-requests: write
