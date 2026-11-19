@@ -107,48 +107,51 @@ export const updateDocumentFields = async ({
     };
   });
 
-  const updatedFields = await prisma.$transaction(async (tx) => {
-    return await Promise.all(
-      fieldsToUpdate.map(async ({ originalField, updateData, recipientEmail }) => {
-        const updatedField = await tx.field.update({
-          where: {
-            id: updateData.id,
-          },
-          data: {
-            type: updateData.type,
-            page: updateData.pageNumber,
-            positionX: updateData.pageX,
-            positionY: updateData.pageY,
-            width: updateData.width,
-            height: updateData.height,
-            fieldMeta: updateData.fieldMeta,
-          },
-        });
-
-        const changes = diffFieldChanges(originalField, updatedField);
-
-        // Handle field updated audit log.
-        if (changes.length > 0) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
-              documentId: documentId,
-              metadata: requestMetadata,
-              data: {
-                fieldId: updatedField.secondaryId,
-                fieldRecipientEmail: recipientEmail,
-                fieldRecipientId: updatedField.recipientId,
-                fieldType: updatedField.type,
-                changes,
-              },
-            }),
+  const updatedFields = await prisma.$transaction(
+    async (tx) => {
+      return await Promise.all(
+        fieldsToUpdate.map(async ({ originalField, updateData, recipientEmail }) => {
+          const updatedField = await tx.field.update({
+            where: {
+              id: updateData.id,
+            },
+            data: {
+              type: updateData.type,
+              page: updateData.pageNumber,
+              positionX: updateData.pageX,
+              positionY: updateData.pageY,
+              width: updateData.width,
+              height: updateData.height,
+              fieldMeta: updateData.fieldMeta,
+            },
           });
-        }
 
-        return updatedField;
-      }),
-    );
-  });
+          const changes = diffFieldChanges(originalField, updatedField);
+
+          // Handle field updated audit log.
+          if (changes.length > 0) {
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
+                documentId: documentId,
+                metadata: requestMetadata,
+                data: {
+                  fieldId: updatedField.secondaryId,
+                  fieldRecipientEmail: recipientEmail,
+                  fieldRecipientId: updatedField.recipientId,
+                  fieldType: updatedField.type,
+                  changes,
+                },
+              }),
+            });
+          }
+
+          return updatedField;
+        }),
+      );
+    },
+    { timeout: 30_000 },
+  );
 
   return {
     fields: updatedFields,
