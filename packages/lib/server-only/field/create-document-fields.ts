@@ -91,44 +91,47 @@ export const createDocumentFields = async ({
     };
   });
 
-  const createdFields = await prisma.$transaction(async (tx) => {
-    return await Promise.all(
-      validatedFields.map(async (field) => {
-        const createdField = await tx.field.create({
-          data: {
-            type: field.type,
-            page: field.pageNumber,
-            positionX: field.pageX,
-            positionY: field.pageY,
-            width: field.width,
-            height: field.height,
-            customText: '',
-            inserted: false,
-            fieldMeta: field.fieldMeta,
-            documentId,
-            recipientId: field.recipientId,
-          },
-        });
-
-        // Handle field created audit log.
-        await tx.documentAuditLog.create({
-          data: createDocumentAuditLogData({
-            type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
-            documentId,
-            metadata: requestMetadata,
+  const createdFields = await prisma.$transaction(
+    async (tx) => {
+      return await Promise.all(
+        validatedFields.map(async (field) => {
+          const createdField = await tx.field.create({
             data: {
-              fieldId: createdField.secondaryId,
-              fieldRecipientEmail: field.recipientEmail,
-              fieldRecipientId: createdField.recipientId,
-              fieldType: createdField.type,
+              type: field.type,
+              page: field.pageNumber,
+              positionX: field.pageX,
+              positionY: field.pageY,
+              width: field.width,
+              height: field.height,
+              customText: '',
+              inserted: false,
+              fieldMeta: field.fieldMeta,
+              documentId,
+              recipientId: field.recipientId,
             },
-          }),
-        });
+          });
 
-        return createdField;
-      }),
-    );
-  });
+          // Handle field created audit log.
+          await tx.documentAuditLog.create({
+            data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
+              documentId,
+              metadata: requestMetadata,
+              data: {
+                fieldId: createdField.secondaryId,
+                fieldRecipientEmail: field.recipientEmail,
+                fieldRecipientId: createdField.recipientId,
+                fieldType: createdField.type,
+              },
+            }),
+          });
+
+          return createdField;
+        }),
+      );
+    },
+    { timeout: 30_000 },
+  );
 
   return {
     fields: createdFields,
